@@ -56,7 +56,6 @@ public class DronezMod
         // some example code to dispatch IMC to another mod
         InterModComms.sendTo("dronez", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
-
     private void processIMC(final InterModProcessEvent event)
     {
         // some example code to receive and process InterModComms from other mods

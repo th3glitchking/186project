@@ -31,6 +31,11 @@ public class Drone extends FlyingEntity {
         this.owner = ownerIn;
     }
 
+    protected void registerAttributes() {
+        super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
+    }
+
     protected void registerGoals() {
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, 1.0D, 1.0F, 4.0F));
