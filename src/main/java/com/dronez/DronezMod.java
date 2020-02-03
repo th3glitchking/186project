@@ -25,7 +25,17 @@ public class DronezMod
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
+
+
     public DronezMod() {
+
+
+    //creates the items for crafting
+        Item ironDroneBlade = new Item();
+        Item ironDroneShell = new Item();
+        Item ironDroneCore = new Item();
+
+
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
@@ -81,4 +91,9 @@ public class DronezMod
             LOGGER.info("HELLO from Register Block");
         }
     }
+    //Registers all of the items
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        event.getRegistry().registerAll(ironDroneBlade,ironDroneCasing,ironDroneCore);
+    }
+
 }
