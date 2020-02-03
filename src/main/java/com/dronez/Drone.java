@@ -26,6 +26,8 @@ public class Drone extends FlyingEntity {
     private LivingEntity owner;
     private boolean charging;
 
+
+
     protected Drone(EntityType<? extends Drone> type, World p_i48578_2_, LivingEntity ownerIn) {
         super(type, p_i48578_2_);
         this.owner = ownerIn;
