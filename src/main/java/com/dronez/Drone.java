@@ -3,8 +3,6 @@ package com.dronez;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.passive.IFlyingAnimal;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.FlyingPathNavigator;
 import net.minecraft.pathfinding.GroundPathNavigator;
@@ -15,7 +13,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.entity.ai.goal.FollowOwnerFlyingGoal;
 
 import java.util.EnumSet;
 
@@ -24,6 +21,7 @@ public class Drone extends FlyingEntity {
 
     //add material type tracking and texture locations here
     private LivingEntity owner;
+    private EntityType<? extends Drone> entityType;
     private boolean charging;
 
 
@@ -31,6 +29,7 @@ public class Drone extends FlyingEntity {
     protected Drone(EntityType<? extends Drone> type, World p_i48578_2_, LivingEntity ownerIn) {
         super(type, p_i48578_2_);
         this.owner = ownerIn;
+        this.entityType = type;
     }
 
     protected void registerAttributes() {
@@ -65,6 +64,23 @@ public class Drone extends FlyingEntity {
 
     public boolean isCharging() {
         return charging;
+    }
+
+    public EntityType getEntityType() throws NoSuchMethodException {
+        if (this.entityType == null) {
+            EntityType.Builder entityTypeBuilder = EntityType.Builder.create(EntityFactory.getInstance(), EntityClassification.CREATURE);
+            //entityTypeBuilder.setCustomClientFactory(EntityFactory.getInstance().createOnClientFunction); Client Factory never called.
+            entityTypeBuilder.setTrackingRange(10);
+            entityTypeBuilder.setUpdateInterval(3);
+            entityTypeBuilder.setShouldReceiveVelocityUpdates(false);
+            entityTypeBuilder.size(1.0F, 1.0F);
+            entityTypeBuilder.disableSerialization();
+            this.entityType = entityTypeBuilder.build("drone");
+            this.entityType.setRegistryName("dronez", "drone");
+            EntityFactory.getInstance().addEntityType(this.entityType, Drone.class.getDeclaredConstructor(EntityType.class, World.class, LivingEntity.class), "net"); //MAY BE WEIRD
+        }
+        return this.entityType;
+
     }
 
     static class FollowOwner extends Goal {
