@@ -6,6 +6,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -34,12 +36,21 @@ public class DronezMod
     static Item ironDroneBlade;
     static Item ironDroneShell;
     static Item ironDroneCore;
+    static final ItemGroup dronezGroup = new ItemGroup("dronez") {
+        @Override
+        public ItemStack createIcon() {
+            return ironDroneCore.getDefaultInstance();
+        }
+    };
 
     public DronezMod() {
 
 
         //creates the items for crafting
-        ironDroneBlade = new Item(new Item.Properties());
+        ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:ironeDroneBlade");
+        ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:ironDroneShell");
+        ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:ironDroneCore");
+
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
