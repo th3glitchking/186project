@@ -47,9 +47,9 @@ public class DronezMod
 
 
         //creates the items for crafting
-        ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:ironeDroneBlade");
-        ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:ironDroneShell");
-        ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:ironDroneCore");
+        ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
+        ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
+        ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
 
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
