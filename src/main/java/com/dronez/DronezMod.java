@@ -100,7 +100,7 @@ public class DronezMod
         }
         @SubscribeEvent
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event){
-            event.getRegistry().register(drone.getEntityType());
+                event.getRegistry().register(drone.getEntityType());//doesn't work
         }
     }
     //Registers all of the items

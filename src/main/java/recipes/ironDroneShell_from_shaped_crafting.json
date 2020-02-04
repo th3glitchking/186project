@@ -10,13 +10,12 @@
     {
         "x":
         {
-            "type": "forge:ore_dict",
-            "ore": "ingot/iron"
+            "item": "minecraft:iron_ingot"
+
         }
     },
     "result":
     {
-        "item": "DronezMod:ironDroneShell",
-        "count": 1,
+        "item": "DronezMod:ironDroneShell"
     }
 }
