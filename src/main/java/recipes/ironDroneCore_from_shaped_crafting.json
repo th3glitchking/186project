@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":
+    [
+        "x x",
+        " y ",
+        "xwx"
+    ],
+    "key":
+    {
+        "x":
+        {
+            "type": "forge:ore_dict",
+            "ore": "ingot/iron"
+        }
+    },
+    "result":
+    {
+        "item": "DronezMod:ironDroneShell",
+        "count": 1,
+    }
+}
