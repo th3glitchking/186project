@@ -99,7 +99,7 @@ public class DronezMod
             event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore);
         }
         @SubscribeEvent
-        public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event){
+        public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) throws NoSuchMethodException {
             event.getRegistry().register(drone.getEntityType());
         }
     }
