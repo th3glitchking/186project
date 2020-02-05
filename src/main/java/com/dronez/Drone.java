@@ -66,23 +66,6 @@ public class Drone extends FlyingEntity {
         return charging;
     }
 
-    public EntityType getEntityType() throws NoSuchMethodException {
-        if (this.entityType == null) {
-            EntityType.Builder entityTypeBuilder = EntityType.Builder.create(EntityFactory.getInstance(), EntityClassification.CREATURE);
-            //entityTypeBuilder.setCustomClientFactory(EntityFactory.getInstance().createOnClientFunction); Client Factory never called.
-            entityTypeBuilder.setTrackingRange(10);
-            entityTypeBuilder.setUpdateInterval(3);
-            entityTypeBuilder.setShouldReceiveVelocityUpdates(false);
-            entityTypeBuilder.size(1.0F, 1.0F);
-            entityTypeBuilder.disableSerialization();
-            this.entityType = entityTypeBuilder.build("drone");
-            this.entityType.setRegistryName("dronez", "drone");
-            EntityFactory.getInstance().addEntityType(this.entityType, Drone.class.getDeclaredConstructor(EntityType.class, World.class, LivingEntity.class), "net"); //MAY BE WEIRD
-        }
-        return this.entityType;
-
-    }
-
     static class FollowOwner extends Goal {
         protected final Drone drone;
         private LivingEntity owner;
