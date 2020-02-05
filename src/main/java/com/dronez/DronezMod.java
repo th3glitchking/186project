@@ -1,12 +1,17 @@
 package com.dronez;
 
+import com.dronez.entities.EntityFactory;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,6 +24,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
@@ -72,6 +78,7 @@ public class DronezMod
     private void doClientStuff(final FMLClientSetupEvent event) {
         // do something that can only be done on the client
         LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
+        OBJLoader.INSTANCE.addDomain("dronez");
         RenderingRegistry.registerEntityRenderingHandler(Drone.class, RenderDroneFactory.INSTANCE);
     }
 
@@ -99,6 +106,19 @@ public class DronezMod
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
 
+
+        public static EntityType<Drone> drone = null;
+
+        private static void generateEntityTypes() {
+            LOGGER.debug("Wabbits: Creating EntityTypes...");
+            /*drone = EntityType.Builder
+                    .create(, EntityClassification.CREATURE)
+                    .size(0.8F, 1F)
+                    .build("drone")
+                    .setRegistryName("dronez:drone);*/
+            drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
+        }
+
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
@@ -109,8 +129,12 @@ public class DronezMod
             event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore);
         }
         @SubscribeEvent
-        public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) throws NoSuchMethodException {
-
+        public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
+            LOGGER.debug("Wabbits: Registering Entities...");
+            generateEntityTypes();
+            event.getRegistry().registerAll(
+                    drone
+            );
         }
     }
     //Registers all of the items

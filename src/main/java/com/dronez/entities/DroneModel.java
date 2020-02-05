@@ -3,131 +3,107 @@ package com.dronez.entities;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelBox;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class DroneModel<T extends Drone> extends EntityModel<T> {
-    private final RendererModel wabbitLeftFoot = new RendererModel(this, 26, 24);
-    private final RendererModel wabbitRightFoot = new RendererModel(this, 8, 24);
-    private final RendererModel wabbitLeftThigh = new RendererModel(this, 30, 15);
-    private final RendererModel wabbitRightThigh = new RendererModel(this, 16, 15);
-    private final RendererModel wabbitBody = new RendererModel(this, 0, 0);
-    private final RendererModel wabbitLeftArm = new RendererModel(this, 8, 15);
-    private final RendererModel wabbitRightArm = new RendererModel(this, 0, 15);
-    private final RendererModel wabbitHead = new RendererModel(this, 32, 0);
-    private final RendererModel wabbitLeftEar = new RendererModel(this, 58, 0);
-    private final RendererModel wabbitRightEar = new RendererModel(this, 52, 0);
-    private final RendererModel wabbitTail = new RendererModel(this, 52, 6);
-    private final RendererModel wabbitNose = new RendererModel(this, 32, 9);
-    private float jumpRotation;
+    private final RendererModel bb_main;
+    private final RendererModel flying_1;
+    private final RendererModel holdy_bits;
+    private final RendererModel blades;
+    private final RendererModel flying_2;
+    private final RendererModel holdy_bits2;
+    private final RendererModel blades2;
+    private final RendererModel flying_3;
+    private final RendererModel holdy_bits3;
+    private final RendererModel blades3;
+    private final RendererModel flying_4;
+    private final RendererModel holdy_bits4;
+    private final RendererModel blades4;
 
     public DroneModel() {
-        this.wabbitLeftFoot.addBox(-1.0F, 5.5F, -3.7F, 2, 1, 7);
-        this.wabbitLeftFoot.setRotationPoint(3.0F, 17.5F, 3.7F);
-        this.wabbitLeftFoot.mirror = true;
+        textureWidth = 32;
+        textureHeight = 32;
 
-        this.wabbitRightFoot.addBox(-1.0F, 5.5F, -3.7F, 2, 1, 7);
-        this.wabbitRightFoot.setRotationPoint(-3.0F, 17.5F, 3.7F);
-        this.wabbitRightFoot.mirror = true;
+        bb_main = new RendererModel(this);
+        bb_main.setRotationPoint(0.0F, 24.0F, 0.0F);
+        setRotationAngle(bb_main, 0.0F, 1.5708F, 0.0F);
+        bb_main.cubeList.add(new ModelBox(bb_main, 0, 0, -4.9983F, -2.0122F, -3.0105F, 10, 2, 6, 0.0F, false));
 
-        this.wabbitLeftThigh.addBox(-1.0F, 0.0F, 0.0F, 2, 4, 5);
-        this.wabbitLeftThigh.setRotationPoint(3.0F, 17.5F, 3.7F);
-        this.wabbitLeftThigh.mirror = true;
+        flying_1 = new RendererModel(this);
+        flying_1.setRotationPoint(0.0F, 24.0F, 0.0F);
+        setRotationAngle(flying_1, 0.0F, 1.5708F, 0.0F);
 
-        this.wabbitRightThigh.addBox(-1.0F, 0.0F, 0.0F, 2, 4, 5);
-        this.wabbitRightThigh.setRotationPoint(-3.0F, 17.5F, 3.7F);
-        this.wabbitRightThigh.mirror = true;
+        holdy_bits = new RendererModel(this);
+        holdy_bits.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_1.addChild(holdy_bits);
+        holdy_bits.cubeList.add(new ModelBox(holdy_bits, 0, 29, -8.0F, -4.0F, 4.0F, 1, 1, 1, 0.0F, false));
+        holdy_bits.cubeList.add(new ModelBox(holdy_bits, 0, 29, -7.0F, -3.0F, 3.0F, 2, 1, 1, 0.0F, false));
 
-        this.wabbitBody.addBox(-3.0F, -2.0F, -10.0F, 6, 5, 10);
-        this.wabbitBody.setRotationPoint(0.0F, 19.0F, 8.0F);
-        this.wabbitBody.mirror = true;
+        blades = new RendererModel(this);
+        blades.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_1.addChild(blades);
+        blades.cubeList.add(new ModelBox(blades, 0, 8, -11.0F, -4.0F, 2.0F, 6, 0, 6, 0.0F, false));
 
-        this.wabbitLeftArm.addBox(-1.0F, 0.0F, -1.0F, 2, 7, 2);
-        this.wabbitLeftArm.setRotationPoint(3.0F, 17.0F, -1.0F);
-        this.wabbitLeftArm.mirror = true;
+        flying_2 = new RendererModel(this);
+        flying_2.setRotationPoint(0.0F, 24.0F, 0.0F);
+        setRotationAngle(flying_2, 0.0F, -1.5708F, 0.0F);
 
-        this.wabbitRightArm.addBox(-1.0F, 0.0F, -1.0F, 2, 7, 2);
-        this.wabbitRightArm.setRotationPoint(-3.0F, 17.0F, -1.0F);
-        this.wabbitRightArm.mirror = true;
+        holdy_bits2 = new RendererModel(this);
+        holdy_bits2.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_2.addChild(holdy_bits2);
+        holdy_bits2.cubeList.add(new ModelBox(holdy_bits2, 0, 29, -8.0F, -4.0F, 4.0F, 1, 1, 1, 0.0F, false));
+        holdy_bits2.cubeList.add(new ModelBox(holdy_bits2, 0, 29, -7.0F, -3.0F, 3.0F, 2, 1, 1, 0.0F, false));
 
-        this.wabbitHead.addBox(-2.5F, -4.0F, -5.0F, 5, 4, 5);
-        this.wabbitHead.setRotationPoint(0.0F, 16.0F, -1.0F);
-        this.wabbitHead.mirror = true;
+        blades2 = new RendererModel(this);
+        blades2.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_2.addChild(blades2);
+        blades2.cubeList.add(new ModelBox(blades2, 0, 8, -11.0F, -4.0F, 2.0F, 6, 0, 6, 0.0F, false));
 
-        this.wabbitRightEar.addBox(-2.5F, -9.0F, -1.0F, 2, 5, 1);
-        this.wabbitRightEar.setRotationPoint(0.0F, 16.0F, -1.0F);
-        this.wabbitRightEar.mirror = true;
+        flying_3 = new RendererModel(this);
+        flying_3.setRotationPoint(0.0F, 24.0F, 0.0F);
 
-        this.wabbitLeftEar.addBox(0.5F, -9.0F, -1.0F, 2, 5, 1);
-        this.wabbitLeftEar.setRotationPoint(0.0F, 16.0F, -1.0F);
-        this.wabbitLeftEar.mirror = true;
+        holdy_bits3 = new RendererModel(this);
+        holdy_bits3.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_3.addChild(holdy_bits3);
+        holdy_bits3.cubeList.add(new ModelBox(holdy_bits3, 0, 29, -5.0F, -4.0F, 7.0F, 1, 1, 1, 0.0F, false));
+        holdy_bits3.cubeList.add(new ModelBox(holdy_bits3, 0, 29, -4.0F, -3.0F, 5.0F, 1, 1, 2, 0.0F, false));
 
-        this.wabbitTail.addBox(-1.5F, -1.5F, 0.0F, 3, 3, 2);
-        this.wabbitTail.setRotationPoint(0.0F, 20.0F, 7.0F);
-        this.wabbitTail.mirror = true;
+        blades3 = new RendererModel(this);
+        blades3.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_3.addChild(blades3);
+        blades3.cubeList.add(new ModelBox(blades3, 0, 8, -8.0F, -4.0F, 5.0F, 6, 0, 6, 0.0F, false));
 
-        this.wabbitNose.addBox(-0.5F, -2.5F, -5.5F, 1, 1, 1);
-        this.wabbitNose.setRotationPoint(0.0F, 16.0F, -1.0F);
-        this.wabbitNose.mirror = true;
+        flying_4 = new RendererModel(this);
+        flying_4.setRotationPoint(0.0F, 24.0F, 0.0F);
+        setRotationAngle(flying_4, 0.0F, 3.1416F, 0.0F);
+
+        holdy_bits4 = new RendererModel(this);
+        holdy_bits4.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_4.addChild(holdy_bits4);
+        holdy_bits4.cubeList.add(new ModelBox(holdy_bits4, 0, 29, -5.0F, -4.0F, 7.0F, 1, 1, 1, 0.0F, false));
+        holdy_bits4.cubeList.add(new ModelBox(holdy_bits4, 0, 29, -4.0F, -3.0F, 5.0F, 1, 1, 2, 0.0F, false));
+
+        blades4 = new RendererModel(this);
+        blades4.setRotationPoint(0.0F, 0.0F, 0.0F);
+        flying_4.addChild(blades4);
+        blades4.cubeList.add(new ModelBox(blades4, 0, 8, -8.0F, -4.0F, 5.0F, 6, 0, 6, 0.0F, false));
     }
 
     @Override
-    public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        this.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-        GlStateManager.pushMatrix();
-        GlStateManager.scalef(0.6F, 0.6F, 0.6F);
-        GlStateManager.translatef(0.0F, 16.0F * scale, 0.0F);
-//                                                  ,  high # = lower Y
-        renderHead(scale);
-        renderBody(scale);
-        GlStateManager.popMatrix();
+    public void render(T entity, float f, float f1, float f2, float f3, float f4, float f5) {
+        bb_main.render(f5);
+        flying_1.render(f5);
+        flying_2.render(f5);
+        flying_3.render(f5);
+        flying_4.render(f5);
     }
-
-    private void renderBody(float scale) {
-        this.wabbitLeftFoot.render(scale);
-        this.wabbitRightFoot.render(scale);
-        this.wabbitLeftThigh.render(scale);
-        this.wabbitRightThigh.render(scale);
-        this.wabbitBody.render(scale);
-        this.wabbitLeftArm.render(scale);
-        this.wabbitRightArm.render(scale);
-        this.wabbitTail.render(scale);
-    }
-
-    private void renderHead (float scale) {
-        this.wabbitHead.render(scale);
-        this.wabbitLeftEar.render(scale);
-        this.wabbitRightEar.render(scale);
-        this.wabbitNose.render(scale);
-    }
-
-    @Override
-    public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
-        float f = ageInTicks - (float)entityIn.ticksExisted;
-
-        this.wabbitNose.rotateAngleX = headPitch * ((float)Math.PI / 180F);
-        this.wabbitHead.rotateAngleY = netHeadYaw * ((float)Math.PI / 180F);
-        this.wabbitHead.rotateAngleX = headPitch * ((float)Math.PI / 180F);
-        this.wabbitNose.rotateAngleY = netHeadYaw * ((float)Math.PI / 180F);
-
-        this.wabbitRightEar.rotateAngleX = headPitch * ((float)Math.PI / 180F);
-        this.wabbitLeftEar.rotateAngleX = headPitch * ((float)Math.PI / 180F);
-        this.wabbitRightEar.rotateAngleY = this.wabbitNose.rotateAngleY - 0.2617994F;
-        this.wabbitLeftEar.rotateAngleY = this.wabbitNose.rotateAngleY + 0.2617994F;
-
-        this.wabbitLeftThigh.rotateAngleX = (this.jumpRotation * 50.0F - 21.0F) * ((float)Math.PI / 180F);
-        this.wabbitRightThigh.rotateAngleX = (this.jumpRotation * 50.0F - 21.0F) * ((float)Math.PI / 180F);
-
-        this.wabbitLeftFoot.rotateAngleX = this.jumpRotation * 50.0F * ((float)Math.PI / 180F);
-        this.wabbitRightFoot.rotateAngleX = this.jumpRotation * 50.0F * ((float)Math.PI / 180F);
-
-        this.wabbitLeftArm.rotateAngleX = (this.jumpRotation * -40.0F - 11.0F) * ((float)Math.PI / 180F);
-        this.wabbitRightArm.rotateAngleX = (this.jumpRotation * -40.0F - 11.0F) * ((float)Math.PI / 180F);
-    }
-
-    @Override
-    public void setLivingAnimations(T entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
-        super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTick);
+    public void setRotationAngle(RendererModel modelRenderer, float x, float y, float z) {
+        modelRenderer.rotateAngleX = x;
+        modelRenderer.rotateAngleY = y;
+        modelRenderer.rotateAngleZ = z;
     }
 }
