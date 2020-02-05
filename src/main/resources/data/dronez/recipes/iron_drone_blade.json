@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":
+    [
+        " x ",
+        "xxx",
+        " x "
+    ],
+    "key":
+    {
+        "x":
+        {
+            "item": "minecraft:iron_ingot"
+        }
+    },
+    "result":
+    {
+        "item": "dronez:iron_drone_blade"
+    },
+    "textures": {
+        "layer0": "dronez:textures/iron-drone-blade.png"
+    }
+}
