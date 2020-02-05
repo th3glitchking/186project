@@ -1,6 +1,5 @@
-package com.dronez;
+package com.dronez.entities;
 
-import com.dronez.Drone;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.World;

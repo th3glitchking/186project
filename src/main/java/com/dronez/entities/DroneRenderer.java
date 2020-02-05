@@ -1,4 +1,4 @@
-package com.dronez;
+package com.dronez.entities;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public class DroneRenderer extends MobRenderer<Drone, DroneModel<Drone>> {
-    private static final ResourceLocation SKIN = new ResourceLocation("wabbits:textures/entity/wabbit.png");
+    private static final ResourceLocation SKIN = new ResourceLocation("dronez:textures/entity/base_drone.png");
 
     public DroneRenderer(EntityRendererManager renderManager) {
         //   (renderManager,               model,     shadowSize);

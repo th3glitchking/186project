@@ -1,4 +1,4 @@
-package com.dronez;
+package com.dronez.entities;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
