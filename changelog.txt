@@ -292,7 +292,7 @@ Build: 1.14.4-28.1.64 - Tue Oct 22 22:31:43 GMT 2019
 		Fixed forge rendering pipeline and shape based light occulsion. (#6178)
 
 	559819+AfterRebelion:
-		Exclude Cobblestone slabs and wall recipes (#6230)
+		Exclude Cobblestone slabs and wall data.dronez.recipes (#6230)
 
 =========
 Build: 1.14.4-28.1.62 - Tue Oct 22 19:08:15 GMT 2019
@@ -1503,7 +1503,7 @@ Build: 1.14.3-27.0.16 - Sat Jun 29 21:05:43 GMT 2019
 Build: 1.14.3-27.0.15 - Fri Jun 28 00:23:46 GMT 2019
 	lex:
 		Fix duplicate WorldEvent.Unload call in client key handler. Add recipe
-		generator to replace vanilla recipes with Forge tags.
+		generator to replace vanilla data.dronez.recipes with Forge tags.
 
 =========
 Build: 1.14.3-27.0.14 - Thu Jun 27 17:57:18 GMT 2019
