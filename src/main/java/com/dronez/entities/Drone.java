@@ -19,6 +19,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraftforge.energy.EnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -33,12 +34,14 @@ public class Drone extends FlyingEntity {
     //add material type tracking and texture locations here
     private LivingEntity owner;
     private PartMaterial lfBlade, rfBlade, lbBlade, rbBlade, shell, core;
+    private EnergyStorage battery;
     private boolean charging;
 
 
 
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
+        battery = null;
         this.owner = null;
         this.lfBlade = null;
         this.rfBlade = null;
