@@ -3,6 +3,7 @@ package com.dronez.entities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,15 +27,25 @@ import java.util.Random;
 //For now, this will be the pre-optimization Drone Entity class. Later, this class can easily be modified to support multiple Drone Types via inheritance.
 public class Drone extends FlyingEntity {
 
+    private enum PartMaterial {
+        iron, gold, diamond
+    }
     //add material type tracking and texture locations here
     private LivingEntity owner;
-    private EntityType<? extends Drone> entityType;
+    private PartMaterial lfBlade, rfBlade, lbBlade, rbBlade, shell, core;
     private boolean charging;
 
 
 
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
+        this.owner = null;
+        this.lfBlade = null;
+        this.rfBlade = null;
+        this.lbBlade = null;
+        this.rbBlade = null;
+        this.shell = null;
+        this.core = null;
     }
 
     protected void registerAttributes() {
@@ -69,6 +80,20 @@ public class Drone extends FlyingEntity {
 
     public boolean isCharging() {
         return charging;
+    }
+
+    public Drone setMaterial(PartMaterial material){
+        this.shell = material;
+        this.core = material;
+        this.lfBlade = material;
+        this.rfBlade = material;
+        this.lbBlade = material;
+        this.rbBlade = material;
+        return this;
+    }
+    public Drone setOwner(LivingEntity player){
+        this.owner = player;
+        return this;
     }
 
 
