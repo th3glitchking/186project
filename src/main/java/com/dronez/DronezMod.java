@@ -9,6 +9,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -37,6 +38,8 @@ public class DronezMod
     static Item ironDroneBlade;
     static Item ironDroneShell;
     static Item ironDroneCore;
+    static Item droneSpawnEgg;
+
     static final ItemGroup dronezGroup = new ItemGroup("dronez") {
         @Override
         public ItemStack createIcon() {
@@ -49,6 +52,9 @@ public class DronezMod
         ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
         ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
         ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
+        droneSpawnEgg = new DroneSpawnEggItem((EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE), 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
+                .setRegistryName("dronez:drone_spawn_egg")
+                .addInformation();
 
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -122,7 +128,7 @@ public class DronezMod
 
         @SubscribeEvent
         public static void registerItems(final RegistryEvent.Register<Item> event) {
-            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore);
+            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg);
         }
 
         @SubscribeEvent
