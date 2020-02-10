@@ -1,4 +1,4 @@
-package com.dronez;
+package com.dronez.Items;
 
 import com.dronez.entities.Drone;
 import net.minecraft.client.util.ITooltipFlag;
