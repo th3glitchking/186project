@@ -39,12 +39,12 @@ public class DroneSpawnEggItem extends SpawnEggItem {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
         tooltip.add(new StringTextComponent("Blade 1: " + blade1));
         tooltip.add(new StringTextComponent("Blade 2: " + blade2));
         tooltip.add(new StringTextComponent("Blade 3: " + blade3));
         tooltip.add(new StringTextComponent("Blade 4: " + blade4));
         tooltip.add(new StringTextComponent("Blade shell: " + shell));
         tooltip.add(new StringTextComponent("Blade core: " + core));
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 }

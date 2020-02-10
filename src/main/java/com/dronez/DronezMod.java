@@ -10,6 +10,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -26,6 +28,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -117,14 +121,14 @@ public class DronezMod
             ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
             ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
             droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
-                    .setRegistryName("dronez:drone_spawn_egg")
-                    .addInformation();
+                    .setRegistryName("dronez:drone_spawn_egg");
+            droneSpawnEgg.addInformation(droneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
             event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg);
         }
 
         @SubscribeEvent
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
-            LOGGER.debug("Wabbits: Registering Entities...");
+            LOGGER.debug("Dronez: Registering Entities...");
             event.getRegistry().registerAll(
                     drone
             );
