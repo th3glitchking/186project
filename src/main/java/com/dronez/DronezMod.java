@@ -49,12 +49,7 @@ public class DronezMod
 
     public DronezMod() {
         // Create the items for crafting
-        ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
-        ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
-        ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
-        droneSpawnEgg = new DroneSpawnEggItem((EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone"), 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
-                .setRegistryName("dronez:drone_spawn_egg")
-                .addInformation();
+
 
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -108,17 +103,7 @@ public class DronezMod
     // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
-        public static EntityType<Drone> drone = null;
-
-        private static void generateEntityTypes() {
-            LOGGER.debug("Wabbits: Creating EntityTypes...");
-            /*drone = EntityType.Builder
-                    .create(, EntityClassification.CREATURE)
-                    .size(0.8F, 1F)
-                    .build("drone")
-                    .setRegistryName("dronez:drone);*/
-            drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
-        }
+        public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
 
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
@@ -128,13 +113,18 @@ public class DronezMod
 
         @SubscribeEvent
         public static void registerItems(final RegistryEvent.Register<Item> event) {
+            ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
+            ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
+            ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
+            droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
+                    .setRegistryName("dronez:drone_spawn_egg")
+                    .addInformation();
             event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg);
         }
 
         @SubscribeEvent
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
             LOGGER.debug("Wabbits: Registering Entities...");
-            generateEntityTypes();
             event.getRegistry().registerAll(
                     drone
             );
