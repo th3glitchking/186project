@@ -1,5 +1,6 @@
 package com.dronez.entities;
 
+import com.dronez.PartMaterial;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -28,9 +29,6 @@ import java.util.Random;
 //For now, this will be the pre-optimization Drone Entity class. Later, this class can easily be modified to support multiple Drone Types via inheritance.
 public class Drone extends FlyingEntity {
 
-    private enum PartMaterial {
-        iron, gold, diamond
-    }
     //add material type tracking and texture locations here
     private LivingEntity owner;
     private PartMaterial lfBlade, rfBlade, lbBlade, rbBlade, shell, core;
@@ -53,7 +51,9 @@ public class Drone extends FlyingEntity {
 
     protected void registerAttributes() {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.core);
+        this.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(2.0D * ((this.lfBlade + this.rfBlade + this.lbBlade + this.rbBlade)/4.0));
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.shell);
     }
 
     protected void registerGoals() {
@@ -94,8 +94,13 @@ public class Drone extends FlyingEntity {
         this.rbBlade = material;
         return this;
     }
+
     public Drone setOwner(LivingEntity player){
         this.owner = player;
+        return this;
+    }
+    public Drone initBattery(int capacity){
+        battery = new EnergyStorage(capacity, capacity, capacity, capacity);
         return this;
     }
 
@@ -207,11 +212,15 @@ public class Drone extends FlyingEntity {
     }
 
     static class Charge extends Goal {
+        protected EnergyStorage battery;
 
-        
+        public Charge(EnergyStorage battery){
+
+        }
+
         @Override
         public boolean shouldExecute() {
-            return false;
+            return battery.getEnergyStored() < 100;
         }
     }
 

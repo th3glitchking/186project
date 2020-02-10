@@ -10,6 +10,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.stream.Collectors;
 import com.dronez.entities.Drone;
 
@@ -110,7 +112,7 @@ public class DronezMod
         public static EntityType<Drone> drone = null;
 
         private static void generateEntityTypes() {
-            LOGGER.debug("Wabbits: Creating EntityTypes...");
+            LOGGER.debug("Dronez: Creating EntityTypes...");
             /*drone = EntityType.Builder
                     .create(, EntityClassification.CREATURE)
                     .size(0.8F, 1F)
