@@ -1,5 +1,6 @@
 package com.dronez;
 
+import com.dronez.entities.Drone;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -23,7 +24,7 @@ public class DroneSpawnEggItem extends SpawnEggItem {
     private String shell;
     private String core;
 
-    public DroneSpawnEggItem(EntityType<?> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, String blade1, String blade2, String blade3, String blade4, String shell, String core)
+    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, String blade1, String blade2, String blade3, String blade4, String shell, String core)
     {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
         super(typeIn, primaryColorIn, secondaryColorIn, builder);
         this.blade1 = blade1;

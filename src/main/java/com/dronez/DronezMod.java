@@ -52,7 +52,7 @@ public class DronezMod
         ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
         ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
         ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
-        droneSpawnEgg = new DroneSpawnEggItem((EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE), 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
+        droneSpawnEgg = new DroneSpawnEggItem((EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone"), 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
                 .setRegistryName("dronez:drone_spawn_egg")
                 .addInformation();
 
