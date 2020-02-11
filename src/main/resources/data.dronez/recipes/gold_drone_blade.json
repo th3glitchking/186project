@@ -1,0 +1,21 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":
+    [
+        " x ",
+        "xxx",
+        " x "
+    ],
+    "key":
+    {
+        "x":
+        {
+            "type": "forge:ore_dict",
+            "ore": "ingotGold"
+        }
+    },
+    "result":
+    {
+        "item": "dronez:gold_drone_blade"
+    }
+}

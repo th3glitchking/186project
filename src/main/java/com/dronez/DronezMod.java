@@ -40,6 +40,12 @@ public class DronezMod
     static Item ironDroneBlade;
     static Item ironDroneShell;
     static Item ironDroneCore;
+    static Item goldDroneBlade;
+    static Item goldDroneShell;
+    static Item goldDroneCore;
+    static Item diamondDroneBlade;
+    static Item diamondDroneShell;
+    static Item diamondDroneCore;
     static Item droneSpawnEgg;
 
     static final ItemGroup dronezGroup = new ItemGroup("dronez") {
@@ -118,10 +124,18 @@ public class DronezMod
             ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
             ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
             ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
-            droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
+            goldDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:gold_drone_blade");
+            goldDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:gold_drone_shell");
+            goldDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:gold_drone_core");
+            diamondDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_blade");
+            diamondDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_shell");
+            diamondDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_core");
+
+            droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)))
                     .setRegistryName("dronez:drone_spawn_egg");
             droneSpawnEgg.addInformation(droneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg);
+            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg, goldDroneBlade, goldDroneShell, goldDroneCore
+            ,diamondDroneBlade,diamondDroneCore,diamondDroneShell);
         }
 
         @SubscribeEvent

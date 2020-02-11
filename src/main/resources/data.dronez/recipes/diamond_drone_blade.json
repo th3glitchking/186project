@@ -10,14 +10,12 @@
     {
         "x":
         {
-            "item": "minecraft:iron_ingot"
+            "type": "forge:ore_dict",
+            "ore": "gemDiamond"
         }
     },
     "result":
     {
-        "item": "dronez:iron_drone_blade"
-    },
-    "textures": {
-        "layer0": "dronez:textures/iron_drone_blade.png"
+        "item": "dronez:diamond_drone_blade"
     }
 }
