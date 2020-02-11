@@ -6,16 +6,31 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.RandomSwimmingGoal;
+import net.minecraft.entity.ai.goal.RandomWalkingGoal;
+import net.minecraft.entity.monster.GhastEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.FlyingPathNavigator;
 import net.minecraft.pathfinding.GroundPathNavigator;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
@@ -24,14 +39,18 @@ import net.minecraftforge.energy.EnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 //For now, this will be the pre-optimization Drone Entity class. Later, this class can easily be modified to support multiple Drone Types via inheritance.
 public class Drone extends FlyingEntity {
 
     //add material type tracking and texture locations here
-    private LivingEntity owner;
-    private PartMaterial lfBlade, rfBlade, lbBlade, rbBlade, shell, core;
+    protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(Drone.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+    protected static final DataParameter<Byte> SHELL = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
+    protected static final DataParameter<Byte> CORE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
+    protected static final DataParameter<Byte> BLADE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     private EnergyStorage battery;
     private boolean charging;
 
@@ -39,28 +58,22 @@ public class Drone extends FlyingEntity {
 
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
-        battery = null;
-        this.owner = null;
-        this.lfBlade = null;
-        this.rfBlade = null;
-        this.lbBlade = null;
-        this.rbBlade = null;
-        this.shell = null;
-        this.core = null;
+        this.moveController = new MoveHelperController(this);
     }
 
     protected void registerAttributes() {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.core);
-        this.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(2.0D * ((this.lfBlade + this.rfBlade + this.lbBlade + this.rbBlade)/4.0));
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.shell);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);// * this.core.getValue());
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D);// * this.blade.getValue());
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D);// * this.shell.getValue());
     }
 
     protected void registerGoals() {
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
-        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, 1.0D, 1.0F, 4.0F));
-        this.goalSelector.addGoal(3, new Drone.Charge());
-        this.goalSelector.addGoal(5, new Drone.Wander());
+        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 1.0F, 4.0F));
+        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
+        this.goalSelector.addGoal(5, new LookRandomlyGoal(this));
+        this.goalSelector.addGoal(7, new RandomFlyGoal(this));
     }
 
     public void tick() {
@@ -71,39 +84,126 @@ public class Drone extends FlyingEntity {
     protected void registerData() {
         super.registerData();
         //and then add any other data that needs to be registered upon spawning
+        this.dataManager.register(OWNER_UNIQUE_ID, Optional.empty());
+        this.dataManager.register(SHELL, (byte)0);
+        this.dataManager.register(CORE, (byte)0);
+        this.dataManager.register(BLADE, (byte)0);
+    }
+
+    public void writeAdditional(CompoundNBT compound) {
+        super.writeAdditional(compound);
+        if (this.getOwnerId() == null) {
+            compound.putString("OwnerUUID", "");
+        } else {
+            compound.putString("OwnerUUID", this.getOwnerId().toString());
+        }
+        compound.putByte("Shell", this.dataManager.get(SHELL));
+        compound.putByte("Core", this.dataManager.get(CORE));
+        compound.putByte("Blade", this.dataManager.get(BLADE));
+        compound.putBoolean("Charging", this.isCharging());
+    }
+    public void readAdditional(CompoundNBT compound) {
+        super.readAdditional(compound);
+        String s;
+        if (compound.contains("OwnerUUID", 8)) {
+            s = compound.getString("OwnerUUID");
+        } else {
+            String s1 = compound.getString("Owner");
+            s = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.getServer(), s1);
+        }
+
+        if (!s.isEmpty()) {
+            try {
+                this.setOwnerId(UUID.fromString(s));
+            } catch (Throwable var4) {
+                this.setOwnerId(this.world.getClosestPlayer(this, 100).getUniqueID());
+            }
+        }
+        this.dataManager.set(SHELL, compound.getByte("Shell"));
+        this.dataManager.set(CORE, compound.getByte("Core"));
+        this.dataManager.set(BLADE, compound.getByte("Blade"));
+
     }
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
-        return 2.6F;
+        return 0.3F;
     }
 
+    @Nullable
+    public UUID getOwnerId() {
+        return this.dataManager.get(OWNER_UNIQUE_ID).orElse((UUID)null);
+    }
+
+    public void setOwnerId(@Nullable UUID p_184754_1_) {
+        this.dataManager.set(OWNER_UNIQUE_ID, Optional.ofNullable(p_184754_1_));
+    }
+
+    @Nullable
     public LivingEntity getOwner() {
-        return owner;
+        try {
+            UUID uuid = this.getOwnerId();
+            return uuid == null ? null : this.world.getPlayerByUuid(uuid);
+        } catch (IllegalArgumentException var2) {
+            return null;
+        }
     }
 
     public boolean isCharging() {
         return charging;
     }
 
-    public Drone setMaterial(PartMaterial material){
-        this.shell = material;
-        this.core = material;
-        this.lfBlade = material;
-        this.rfBlade = material;
-        this.lbBlade = material;
-        this.rbBlade = material;
-        return this;
-    }
-
-    public Drone setOwner(LivingEntity player){
-        this.owner = player;
-        return this;
-    }
     public Drone initBattery(int capacity){
-        battery = new EnergyStorage(capacity, capacity, capacity, capacity);
+        this.battery = new EnergyStorage(capacity, capacity, capacity, capacity);
         return this;
     }
 
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        super.getHurtSound(damageSourceIn);
+        return SoundEvents.ENTITY_BLAZE_HURT;
+    }
+
+
+
+
+    static class MoveHelperController extends MovementController {
+        private final Drone parentEntity;
+        private int courseChangeCooldown = 0;
+
+        public MoveHelperController(Drone drone) {
+            super(drone);
+            this.parentEntity = drone;
+        }
+
+        public void tick() {
+            if (this.action == MovementController.Action.MOVE_TO) {
+                if (this.courseChangeCooldown-- <= 0) {
+                    this.courseChangeCooldown += this.parentEntity.getRNG().nextInt(5) + 2;
+                    Vec3d vec3d = new Vec3d(this.posX - this.parentEntity.posX, this.posY - this.parentEntity.posY, this.posZ - this.parentEntity.posZ);
+                    double d0 = vec3d.length();
+                    vec3d = vec3d.normalize();
+                    if (this.func_220673_a(vec3d, MathHelper.ceil(d0))) {
+                        this.parentEntity.setMotion(this.parentEntity.getMotion().add(vec3d.scale(0.1D)));
+                    } else {
+                        this.action = MovementController.Action.WAIT;
+                    }
+                }
+
+            }
+        }
+
+        private boolean func_220673_a(Vec3d p_220673_1_, int p_220673_2_) {
+            AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
+
+            for(int i = 1; i < p_220673_2_; ++i) {
+                axisalignedbb = axisalignedbb.offset(p_220673_1_);
+                if (!this.parentEntity.world.isCollisionBoxesEmpty(this.parentEntity, axisalignedbb)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
 
     static class FollowOwner extends Goal {
         protected final Drone drone;
@@ -224,12 +324,46 @@ public class Drone extends FlyingEntity {
         }
     }
 
-    static class Wander extends Goal {
+    static class RandomFlyGoal extends Goal {
+        private final Drone parentEntity;
 
+        public RandomFlyGoal(Drone drone) {
+            this.parentEntity = drone;
+            this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+        }
 
-        @Override
+        /**
+         * Returns whether the EntityAIBase should begin execution.
+         */
         public boolean shouldExecute() {
+            MovementController movementcontroller = this.parentEntity.getMoveHelper();
+            if (!movementcontroller.isUpdating()) {
+                return true;
+            } else {
+                double d0 = movementcontroller.getX() - this.parentEntity.posX;
+                double d1 = movementcontroller.getY() - this.parentEntity.posY;
+                double d2 = movementcontroller.getZ() - this.parentEntity.posZ;
+                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
+                return d3 < 1.0D || d3 > 3600.0D;
+            }
+        }
+
+        /**
+         * Returns whether an in-progress EntityAIBase should continue executing
+         */
+        public boolean shouldContinueExecuting() {
             return false;
+        }
+
+        /**
+         * Execute a one shot task or start executing a continuous task
+         */
+        public void startExecuting() {
+            Random random = this.parentEntity.getRNG();
+            double d0 = this.parentEntity.posX + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
+            double d1 = this.parentEntity.posY + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
+            double d2 = this.parentEntity.posZ + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
+            this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 1.0D);
         }
     }
 
