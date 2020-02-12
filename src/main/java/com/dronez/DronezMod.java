@@ -52,9 +52,11 @@ public class DronezMod
     static Item diamondDroneBlade;
     static Item diamondDroneShell;
     static Item diamondDroneCore;
-    static Item droneSpawnEgg;
     static SlabBlock chargingBlock;
     static BlockItem chargingBlockItem;
+    static DroneSpawnEggItem ironDroneSpawnEgg;
+    static DroneSpawnEggItem goldDroneSpawnEgg;
+    static DroneSpawnEggItem diamondDroneSpawnEgg;
 
     static final ItemGroup dronezGroup = new ItemGroup("dronez") {
         @Override
@@ -151,10 +153,18 @@ public class DronezMod
             diamondDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_core");
             chargingBlockItem = (BlockItem)new BlockItem(chargingBlock, new Item.Properties().group(dronezGroup)).setRegistryName("dronez:charging_block_item");
 
-            droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)))
-                    .setRegistryName("dronez:drone_spawn_egg");
-            droneSpawnEgg.addInformation(droneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg, goldDroneBlade, goldDroneShell, goldDroneCore
+            ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron","Iron","Iron")
+                    .setRegistryName("dronez:iron_drone_spawn_egg");
+            ironDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+            goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold")
+                    .setRegistryName("dronez:gold_drone_spawn_egg");
+            goldDroneSpawnEgg.addInformation(goldDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+            diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond")
+                    .setRegistryName("dronez:diamond_drone_spawn_egg");
+            diamondDroneSpawnEgg.addInformation(diamondDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+
+
+            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, ironDroneSpawnEgg,goldDroneSpawnEgg,diamondDroneSpawnEgg, goldDroneBlade, goldDroneShell, goldDroneCore
             ,diamondDroneBlade,diamondDroneCore,diamondDroneShell,chargingBlockItem);
         }
 

@@ -33,7 +33,7 @@ public class DroneSpawnEggItem extends SpawnEggItem {
     private String shell;
     private String core;
 
-    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder)
+    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, String blades, String shell, String core)
     {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
         super(typeIn, primaryColorIn, secondaryColorIn, builder);
         //Decode the NBT, first digit is blades, second digit is shell, third digit is core 1 = iron, 2 = gold, 3 = diamond
