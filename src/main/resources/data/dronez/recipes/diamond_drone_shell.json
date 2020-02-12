@@ -10,8 +10,7 @@
     {
         "x":
         {
-            "type": "forge:ore_Dict",
-            "ore": "gemDiamond"
+            "item": "minecraft:diamond"
         }
     },
     "result":

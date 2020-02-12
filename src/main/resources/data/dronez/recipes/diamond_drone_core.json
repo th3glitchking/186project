@@ -10,13 +10,11 @@
     {
         "x":
         {
-            "type": "forge:ore_dict",
-            "ore": "gemDiamond"
+            "item": "minecraft:diamond"
         },
         "y":
         {
-            "type": "forge:ore_dict",
-            "ore": "dustRedstone"
+            "item": "minecraft:redstone"
         }
     },
     "result":
