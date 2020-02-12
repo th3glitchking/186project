@@ -5,6 +5,7 @@ import com.dronez.entities.Drone;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -52,7 +53,7 @@ public class DronezMod
     static Item diamondDroneShell;
     static Item diamondDroneCore;
     static Item droneSpawnEgg;
-    static Block chargingBlock;
+    static SlabBlock chargingBlock;
     static BlockItem chargingBlockItem;
 
     static final ItemGroup dronezGroup = new ItemGroup("dronez") {
@@ -138,7 +139,7 @@ public class DronezMod
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
             LOGGER.info("HELLO from Register Block");
-            chargingBlock = new Block(Block.Properties.create(Material.GLASS)).setRegistryName("dronez:charging_block");
+            chargingBlock = (SlabBlock)new SlabBlock(Block.Properties.create(Material.GLASS)).setRegistryName("dronez:charging_block");
             blockRegistryEvent.getRegistry().registerAll(chargingBlock);
         }
 
