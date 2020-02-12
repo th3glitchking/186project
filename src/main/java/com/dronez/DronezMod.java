@@ -1,17 +1,19 @@
 package com.dronez;
 
-import com.dronez.entities.EntityFactory;
+import com.dronez.entities.Drone;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.item.SpawnEggItem;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -25,12 +27,12 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
-import com.dronez.entities.Drone;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("dronez")
@@ -42,6 +44,8 @@ public class DronezMod
     static Item ironDroneBlade;
     static Item ironDroneShell;
     static Item ironDroneCore;
+    static Item droneSpawnEgg;
+
     static final ItemGroup dronezGroup = new ItemGroup("dronez") {
         @Override
         public ItemStack createIcon() {
@@ -50,12 +54,8 @@ public class DronezMod
     };
 
     public DronezMod() {
+        // Create the items for crafting
 
-
-        //creates the items for crafting
-        ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
-        ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
-        ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
 
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -89,6 +89,7 @@ public class DronezMod
         // some example code to dispatch IMC to another mod
         InterModComms.sendTo("dronez", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
+
     private void processIMC(final InterModProcessEvent event)
     {
         // some example code to receive and process InterModComms from other mods
@@ -96,6 +97,7 @@ public class DronezMod
                 map(m->m.getMessageSupplier().get()).
                 collect(Collectors.toList()));
     }
+
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
@@ -109,7 +111,7 @@ public class DronezMod
     public static class RegistryEvents {
 
 
-        public static EntityType<Drone> drone = null;
+        public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
 
         private static void generateEntityTypes() {
             LOGGER.debug("Dronez: Creating EntityTypes...");
@@ -118,28 +120,34 @@ public class DronezMod
                     .size(0.8F, 1F)
                     .build("drone")
                     .setRegistryName("dronez:drone);*/
-            drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
         }
+
+
+
 
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
             LOGGER.info("HELLO from Register Block");
         }
+
         @SubscribeEvent
         public static void registerItems(final RegistryEvent.Register<Item> event) {
-            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore);
+            ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
+            ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
+            ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
+            droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron", "Iron","Iron","Iron","Iron","Iron")
+                    .setRegistryName("dronez:drone_spawn_egg");
+            droneSpawnEgg.addInformation(droneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+            event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg);
         }
+
         @SubscribeEvent
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
-            LOGGER.debug("Wabbits: Registering Entities...");
-            generateEntityTypes();
+            LOGGER.debug("Dronez: Registering Entities...");
             event.getRegistry().registerAll(
                     drone
             );
         }
     }
-    //Registers all of the items
-
-
 }

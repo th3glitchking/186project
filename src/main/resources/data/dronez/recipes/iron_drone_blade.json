@@ -18,6 +18,6 @@
         "item": "dronez:iron_drone_blade"
     },
     "textures": {
-        "layer0": "dronez:textures/iron-drone-blade.png"
+        "layer0": "dronez:textures/iron_drone_blade.png"
     }
 }
