@@ -64,9 +64,6 @@ public class DronezMod
     };
 
     public DronezMod() {
-        // Create the items for crafting
-
-
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
@@ -137,8 +134,6 @@ public class DronezMod
 
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // register a new block here
-            LOGGER.info("HELLO from Register Block");
             chargingBlock = (SlabBlock)new SlabBlock(Block.Properties.create(Material.GLASS)).setRegistryName("dronez:charging_block");
             blockRegistryEvent.getRegistry().registerAll(chargingBlock);
         }

@@ -1,7 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"2": "dronez:block/charging_block"
+		"2": "dronez:block/charging_block",
+		"particle": "dronez:block/charging_block"
 	},
 	"elements": [
 		{
