@@ -5,8 +5,10 @@ import com.dronez.entities.Drone;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -47,6 +49,8 @@ public class DronezMod
     static Item diamondDroneShell;
     static Item diamondDroneCore;
     static Item droneSpawnEgg;
+    static Block chargingBlock;
+    static BlockItem chargingBlockItem;
 
     static final ItemGroup dronezGroup = new ItemGroup("dronez") {
         @Override
@@ -117,6 +121,8 @@ public class DronezMod
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
             LOGGER.info("HELLO from Register Block");
+            chargingBlock = new Block(Block.Properties.create(Material.ORGANIC)).setRegistryName("dronez:charging_block");
+            blockRegistryEvent.getRegistry().registerAll(chargingBlock);
         }
 
         @SubscribeEvent
@@ -130,12 +136,13 @@ public class DronezMod
             diamondDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_blade");
             diamondDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_shell");
             diamondDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_core");
+            chargingBlockItem = (BlockItem)new BlockItem(chargingBlock, new Item.Properties().group(dronezGroup)).setRegistryName("dronez:charging_block_item");
 
             droneSpawnEgg = new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)))
                     .setRegistryName("dronez:drone_spawn_egg");
             droneSpawnEgg.addInformation(droneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
             event.getRegistry().registerAll(ironDroneBlade,ironDroneShell,ironDroneCore, droneSpawnEgg, goldDroneBlade, goldDroneShell, goldDroneCore
-            ,diamondDroneBlade,diamondDroneCore,diamondDroneShell);
+            ,diamondDroneBlade,diamondDroneCore,diamondDroneShell,chargingBlockItem);
         }
 
         @SubscribeEvent
