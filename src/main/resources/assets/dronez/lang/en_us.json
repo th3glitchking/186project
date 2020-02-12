@@ -2,6 +2,12 @@
   "item.dronez.iron_drone_blade": "Iron drone blade",
   "item.dronez.iron_drone_core": "Iron drone core",
   "item.dronez.iron_drone_shell": "Iron drone shell",
+  "item.dronez.gold_drone_blade": "Gold drone blade",
+  "item.dronez.gold_drone_core": "Gold drone core",
+  "item.dronez.gold_drone_shell": "Gold drone shell",
+  "item.dronez.diamond_drone_blade": "Diamond drone blade",
+  "item.dronez.diamond_drone_core": "Diamond drone core",
+  "item.dronez.diamond_drone_shell": "Diamond drone shell",
   "item.dronez.drone_spawn_egg": "Drone Spawn Egg",
   "block.dronez.charging_block": "Drone Charging Block"
 }
