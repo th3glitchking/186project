@@ -21,6 +21,7 @@
     },
     "result":
     {
-        "item": "dronez:gold_drone_core"
+        "item": "dronez:gold_drone_core",
+        "count": 1
     }
 }

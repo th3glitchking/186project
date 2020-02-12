@@ -21,6 +21,7 @@
     },
     "result":
     {
-        "item": "dronez:iron_drone_core"
+        "item": "dronez:iron_drone_core",
+        "count": 1
     }
 }

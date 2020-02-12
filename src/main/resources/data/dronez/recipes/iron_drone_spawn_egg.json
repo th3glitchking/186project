@@ -1,0 +1,29 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern":
+    [
+        "x x",
+        " y ",
+        "xzx"
+    ],
+    "key":
+    {
+        "x":
+        {
+            "item": "dronez:iron_drone_blade"
+        },
+        "y":
+        {
+            "item": "dronez:iron_drone_shell"
+        },
+        "z":
+        {
+            "item": "dronez:iron_drone_core"
+        }
+    },
+    "result":
+    {
+        "item": "dronez:drone_spawn_egg",
+        "count": 1
+    }
+}

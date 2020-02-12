@@ -16,6 +16,7 @@
     },
     "result":
     {
-        "item": "dronez:gold_drone_blade"
+        "item": "dronez:gold_drone_blade",
+        "count": 1
     }
 }

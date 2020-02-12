@@ -16,6 +16,7 @@
     },
     "result":
     {
-        "item": "dronez:iron_drone_shell"
+        "item": "dronez:iron_drone_shell",
+        "count": "1"
     }
 }

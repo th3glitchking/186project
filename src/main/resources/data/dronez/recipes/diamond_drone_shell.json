@@ -10,11 +10,13 @@
     {
         "x":
         {
-            "item": "minecraft:diamond"
+            "type": "forge:ore_Dict",
+            "ore": "gemDiamond"
         }
     },
     "result":
     {
-        "item": "dronez:diamond_drone_shell"
+        "item": "dronez:diamond_drone_shell",
+        "count": 1
     }
 }
