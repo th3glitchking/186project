@@ -121,7 +121,7 @@ public class DronezMod
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
             LOGGER.info("HELLO from Register Block");
-            chargingBlock = new Block(Block.Properties.create(Material.ORGANIC)).setRegistryName("dronez:charging_block");
+            chargingBlock = new Block(Block.Properties.create(Material.GLASS)).setRegistryName("dronez:charging_block");
             blockRegistryEvent.getRegistry().registerAll(chargingBlock);
         }
 
