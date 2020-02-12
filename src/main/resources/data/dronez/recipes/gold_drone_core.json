@@ -10,13 +10,11 @@
     {
         "x":
         {
-            "type": "forge:ore_dict",
-            "ore": "ingotGold"
+            "item": "minecraft:gold_ingot"
         },
         "y":
         {
-            "type": "forge:ore_dict",
-            "ore": "dustRedstone"
+            "item": "minecraft:redstone"
         }
     },
     "result":

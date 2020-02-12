@@ -10,8 +10,7 @@
     {
         "x":
         {
-            "type": "forge:ore_dict",
-            "ore": "ingotIron"
+            "item": "minecraft:iron_ingot"
         }
     },
     "result":
