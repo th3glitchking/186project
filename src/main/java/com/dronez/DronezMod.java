@@ -157,12 +157,12 @@ public class DronezMod
 
 
             event.getRegistry().registerAll(
-                    DroneSpawnEggItem.ironDroneSpawnEgg, DroneSpawnEggItem.goldDroneSpawnEgg, DroneSpawnEggItem.diamondDroneSpawnEgg,
                     ironDroneBlade,ironDroneShell,ironDroneCore,
                     goldDroneBlade, goldDroneShell, goldDroneCore,
                     diamondDroneBlade,diamondDroneCore,diamondDroneShell,
                     chargingBlockItem
             );
+            DroneSpawnEggItem.registerEggs();
         }
 
         @SubscribeEvent

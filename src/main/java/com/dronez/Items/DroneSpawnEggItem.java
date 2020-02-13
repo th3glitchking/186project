@@ -39,14 +39,9 @@ public class DroneSpawnEggItem extends SpawnEggItem {
     private String shell;
     private String core;
 
-    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron","Iron","Iron")
-            .setRegistryName("dronez:iron_drone_spawn_egg");
-
-    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold")
-            .setRegistryName("dronez:gold_drone_spawn_egg");
-
-    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond")
-            .setRegistryName("dronez:diamond_drone_spawn_egg");
+    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron","Iron","Iron");
+    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold");
+    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond");
 
 
 
@@ -59,9 +54,16 @@ public class DroneSpawnEggItem extends SpawnEggItem {
         this.blades = blades;
         this.shell = shell;
         this.core = core;
+    }
+
+    public static void registerEggs(){
         ironDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
         goldDroneSpawnEgg.addInformation(goldDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
         diamondDroneSpawnEgg.addInformation(diamondDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+        Registry.register(Registry.ITEM, "dronez:iron_drone_spawn_egg", ironDroneSpawnEgg);
+        Registry.register(Registry.ITEM, "dronez:gold_drone_spawn_egg", goldDroneSpawnEgg);
+        Registry.register(Registry.ITEM, "dronez:diamond_drone_spawn_egg", diamondDroneSpawnEgg);
+
     }
 
 
