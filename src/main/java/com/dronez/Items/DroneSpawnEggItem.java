@@ -1,6 +1,7 @@
 package com.dronez.Items;
 
 import com.dronez.entities.Drone;
+import net.minecraft.block.Block;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityType;
@@ -18,13 +19,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+
+import static com.dronez.DronezMod.RegistryEvents.drone;
+import static com.dronez.DronezMod.dronezGroup;
 
 public class DroneSpawnEggItem extends SpawnEggItem {
 
@@ -32,6 +38,17 @@ public class DroneSpawnEggItem extends SpawnEggItem {
     private String blades;
     private String shell;
     private String core;
+
+    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron","Iron","Iron")
+            .setRegistryName("dronez:iron_drone_spawn_egg");
+
+    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold")
+            .setRegistryName("dronez:gold_drone_spawn_egg");
+
+    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond")
+            .setRegistryName("dronez:diamond_drone_spawn_egg");
+
+
 
     public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, String blades, String shell, String core)
     {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
@@ -42,7 +59,9 @@ public class DroneSpawnEggItem extends SpawnEggItem {
         this.blades = blades;
         this.shell = shell;
         this.core = core;
-
+        ironDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+        goldDroneSpawnEgg.addInformation(goldDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+        diamondDroneSpawnEgg.addInformation(diamondDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
     }
 
 
@@ -86,6 +105,5 @@ public class DroneSpawnEggItem extends SpawnEggItem {
             }
         }
     }
-
 
 }
