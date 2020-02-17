@@ -57,6 +57,7 @@ public class Drone extends FlyingEntity {
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
         this.moveController = new MoveHelperController(this);
+
     }
 
     protected void registerAttributes() {

@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "dronez:item/iron_shell_shard"
+    "layer0": "dronez:item/gold_drone_blade"
   }
 }
