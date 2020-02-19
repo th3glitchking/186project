@@ -61,9 +61,9 @@ public class Drone extends FlyingEntity {
 
     protected void registerAttributes() {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);// * this.core.getValue());
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D);// * this.blade.getValue());
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D);// * this.shell.getValue());
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.dataManager.get(CORE));// * this.core.getValue());
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D * this.dataManager.get(BLADE));// * this.blade.getValue());
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.dataManager.get(SHELL));// * this.shell.getValue());
     }
 
     protected void registerGoals() {
