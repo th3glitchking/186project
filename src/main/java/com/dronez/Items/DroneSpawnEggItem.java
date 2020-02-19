@@ -39,9 +39,10 @@ public class DroneSpawnEggItem extends SpawnEggItem {
     private String shell;
     private String core;
 
-    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Iron","Iron","Iron");
-    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold");
-    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFF0088, 0x696969 , (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond");
+    // Don't touch the primary or secondary ColorIn only affects the diamond one
+    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), "Iron","Iron","Iron");
+    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold");
+    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond");
 
 
 

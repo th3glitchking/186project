@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "dronez:item/diamond_shell_shard"
+    "layer0": "dronez:item/iron_drone_box"
   }
 }
