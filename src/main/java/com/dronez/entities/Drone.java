@@ -44,8 +44,6 @@ public class Drone extends FlyingEntity {
     private EnergyStorage battery;
     private boolean charging;
 
-
-
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
         this.moveController = new MoveHelperController(this);
@@ -83,19 +81,23 @@ public class Drone extends FlyingEntity {
 
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
+
         if (this.getOwnerId() == null) {
             compound.putString("OwnerUUID", "");
         } else {
             compound.putString("OwnerUUID", this.getOwnerId().toString());
         }
+
         compound.putByte("Shell", this.dataManager.get(SHELL));
         compound.putByte("Core", this.dataManager.get(CORE));
         compound.putByte("Blade", this.dataManager.get(BLADE));
         compound.putBoolean("Charging", this.isCharging());
     }
+
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
         String s;
+
         if (compound.contains("OwnerUUID", 8)) {
             s = compound.getString("OwnerUUID");
         } else {
@@ -110,10 +112,10 @@ public class Drone extends FlyingEntity {
                 this.setOwnerId(this.world.getClosestPlayer(this, 100).getUniqueID());
             }
         }
+
         this.dataManager.set(SHELL, compound.getByte("Shell"));
         this.dataManager.set(CORE, compound.getByte("Core"));
         this.dataManager.set(BLADE, compound.getByte("Blade"));
-
     }
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
@@ -143,7 +145,7 @@ public class Drone extends FlyingEntity {
         return charging;
     }
 
-    public Drone initBattery(int capacity){
+    public Drone initBattery(int capacity) {
         this.battery = new EnergyStorage(capacity, capacity, capacity, capacity);
         return this;
     }
@@ -152,9 +154,6 @@ public class Drone extends FlyingEntity {
         super.getHurtSound(damageSourceIn);
         return SoundEvents.ENTITY_BLAZE_HURT;
     }
-
-
-
 
     static class MoveHelperController extends MovementController {
         private final Drone parentEntity;
@@ -178,7 +177,6 @@ public class Drone extends FlyingEntity {
                         this.action = MovementController.Action.WAIT;
                     }
                 }
-
             }
         }
 
@@ -288,7 +286,6 @@ public class Drone extends FlyingEntity {
                                         }
                                     }
                                 }
-
                             }
                         }
                     }
@@ -357,7 +354,5 @@ public class Drone extends FlyingEntity {
             this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 1.0D);
         }
     }
-
-
 }
 

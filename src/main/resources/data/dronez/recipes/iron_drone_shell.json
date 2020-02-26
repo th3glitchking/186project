@@ -2,13 +2,13 @@
     "type": "minecraft:crafting_shaped",
     "pattern":
     [
-        "xxx",
-        "x x",
-        "xxx"
+        "   ",
+        " ii",
+        " ii"
     ],
     "key":
     {
-        "x":
+        "i":
         {
             "item": "minecraft:iron_ingot"
         }
@@ -16,6 +16,6 @@
     "result":
     {
         "item": "dronez:iron_drone_shell",
-        "count": 1
+        "count": 2
     }
 }

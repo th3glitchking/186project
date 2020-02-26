@@ -1,7 +1,6 @@
 package com.dronez.Items;
 
 import com.dronez.entities.Drone;
-import net.minecraft.block.Block;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityType;
@@ -10,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -27,7 +25,6 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static com.dronez.DronezMod.RegistryEvents.drone;
 import static com.dronez.DronezMod.dronezGroup;
@@ -44,10 +41,8 @@ public class DroneSpawnEggItem extends SpawnEggItem {
     public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), "Gold","Gold","Gold");
     public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), "Diamond","Diamond","Diamond");
 
-
-
-    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, String blades, String shell, String core)
-    {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
+    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, String blades, String shell, String core) {
+        //May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
         super(typeIn, primaryColorIn, secondaryColorIn, builder);
         //Decode the NBT, first digit is blades, second digit is shell, third digit is core 1 = iron, 2 = gold, 3 = diamond
         //compound = new CompoundNBT();
@@ -64,10 +59,7 @@ public class DroneSpawnEggItem extends SpawnEggItem {
         Registry.register(Registry.ITEM, "dronez:iron_drone_spawn_egg", ironDroneSpawnEgg);
         Registry.register(Registry.ITEM, "dronez:gold_drone_spawn_egg", goldDroneSpawnEgg);
         Registry.register(Registry.ITEM, "dronez:diamond_drone_spawn_egg", diamondDroneSpawnEgg);
-
     }
-
-
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
@@ -76,6 +68,7 @@ public class DroneSpawnEggItem extends SpawnEggItem {
         tooltip.add(new StringTextComponent("Blade core: " + core));
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
+
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         ItemStack itemstack = playerIn.getHeldItem(handIn);
@@ -108,5 +101,4 @@ public class DroneSpawnEggItem extends SpawnEggItem {
             }
         }
     }
-
 }

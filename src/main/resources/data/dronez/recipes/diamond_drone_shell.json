@@ -2,13 +2,13 @@
     "type": "minecraft:crafting_shaped",
     "pattern":
     [
-        "xxx",
-        "x x",
-        "xxx"
+        "   ",
+        " dd",
+        " dd"
     ],
     "key":
     {
-        "x":
+        "d":
         {
             "item": "minecraft:diamond"
         }
@@ -16,6 +16,6 @@
     "result":
     {
         "item": "dronez:diamond_drone_shell",
-        "count": 1
+        "count": 2
     }
 }

@@ -55,8 +55,8 @@ public class EntityFactory implements EntityType.IFactory<Entity> {
         }
     }
 
-
     public BiFunction<net.minecraftforge.fml.network.FMLPlayMessages.SpawnEntity, World, Entity> createOnClientFunction = this::createOnClient;
+
     /**
      * Spawns an entity on the client side from a server packet.
      * @param spawnPacket The entity spawn packet.
