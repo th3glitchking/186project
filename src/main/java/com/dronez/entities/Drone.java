@@ -1,16 +1,10 @@
 package com.dronez.entities;
 
-import com.dronez.PartMaterial;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.LookRandomlyGoal;
-import net.minecraft.entity.ai.goal.RandomSwimmingGoal;
-import net.minecraft.entity.ai.goal.RandomWalkingGoal;
-import net.minecraft.entity.monster.GhastEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -29,8 +23,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.EnergyStorage;
@@ -68,7 +60,7 @@ public class Drone extends FlyingEntity {
 
     protected void registerGoals() {
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
-        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 1.0F, 4.0F));
+        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
         this.goalSelector.addGoal(5, new LookRandomlyGoal(this));
         this.goalSelector.addGoal(7, new RandomFlyGoal(this));
@@ -83,9 +75,9 @@ public class Drone extends FlyingEntity {
         super.registerData();
         //and then add any other data that needs to be registered upon spawning
         this.dataManager.register(OWNER_UNIQUE_ID, Optional.empty());
-        this.dataManager.register(SHELL, (byte)0);
-        this.dataManager.register(CORE, (byte)0);
-        this.dataManager.register(BLADE, (byte)0);
+        this.dataManager.register(SHELL, (byte)1);
+        this.dataManager.register(CORE, (byte)1);
+        this.dataManager.register(BLADE, (byte)1);
     }
 
     public void writeAdditional(CompoundNBT compound) {
