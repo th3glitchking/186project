@@ -10,7 +10,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,11 +44,7 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
     @Override
     public CompoundNBT write(CompoundNBT compound) {
         // Don't forget to call markDirty if something was changed
-
-        CompoundNBT energyCompound = energyStorage.serializeNBT();
-        if (energyCompound != null) {
-            compound.put(COMPOUND_ENERGY_NAME, energyStorage.serializeNBT());
-        }
+        compound.put(COMPOUND_ENERGY_NAME, energyStorage.serializeNBT());
 
         return compound;
     }
@@ -71,7 +66,7 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
 
     @Override
     public void tick() {
-        //energyStorage.receiveEnergy(1, false);
+
     }
 
     @Nonnull
@@ -80,7 +75,7 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
         if (cap == CapabilityEnergy.ENERGY) {
             return energyInterface.cast();
         } else {
-            return LazyOptional.empty();
+            return super.getCapability(cap, side);
         }
     }
 }
