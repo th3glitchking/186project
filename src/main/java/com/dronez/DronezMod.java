@@ -1,20 +1,24 @@
 package com.dronez;
 
 import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.block.ChargerBlock;
+import com.dronez.block.ChargerBlockTileEntity;
 import com.dronez.entities.Drone;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -122,7 +126,7 @@ public class DronezMod {
 
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            chargingBlock = (SlabBlock)new SlabBlock(Block.Properties.create(Material.GLASS)).setRegistryName("dronez:charging_block");
+            chargingBlock = (ChargerBlock)ChargerBlock.CHARGER_BLOCK.setRegistryName("dronez", "charging_block");
             blockRegistryEvent.getRegistry().registerAll(chargingBlock);
         }
 
@@ -154,6 +158,24 @@ public class DronezMod {
             event.getRegistry().registerAll(
                     drone
             );
+        }
+
+        @SubscribeEvent
+        public static void registerTE(RegistryEvent.Register<TileEntityType<?>> evt) {
+            evt.getRegistry().register(ChargerBlockTileEntity.TYPE);
+        }
+    }
+
+    @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.FORGE)
+    public static class ForgeRegistryEvents {
+        @SubscribeEvent
+        public static void registerCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
+            TileEntity obj = event.getObject();
+
+            if (obj instanceof ChargerBlockTileEntity) {
+                ChargerBlockTileEntity entity = (ChargerBlockTileEntity)obj;
+                event.addCapability(ChargerBlock.IDENTIFIER, entity);
+            }
         }
     }
 }
