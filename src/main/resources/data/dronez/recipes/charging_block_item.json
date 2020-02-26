@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "xcx",
+    "ycy",
+    "xxx"
+  ],
+  "key":
+  {
+    "x":
+    {
+      "tag": "minecraft:planks"
+    },
+    "y":
+    {
+      "item": "minecraft:redstone"
+    },
+    "c":
+    {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result":
+  {
+    "item": "dronez:charging_block_item",
+    "count": 1
+  }
+}
