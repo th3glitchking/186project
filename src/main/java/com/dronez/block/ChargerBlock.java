@@ -15,11 +15,8 @@ public class ChargerBlock extends SlabBlock {
 
     public static ResourceLocation IDENTIFIER = new ResourceLocation("dronez" ,"charger_block");
 
-    private ChargerBlockTileEntity te;
-
     private ChargerBlock() {
         super(Block.Properties.create(Material.GLASS));
-
     }
 
     @Override
@@ -30,10 +27,6 @@ public class ChargerBlock extends SlabBlock {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        if (te == null) {
-            te = new ChargerBlockTileEntity();
-        }
-
-        return te;
+        return new ChargerBlockTileEntity();
     }
 }

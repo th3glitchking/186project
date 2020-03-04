@@ -28,11 +28,10 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
     }
 
     private ChargerBlockEnergy energyStorage;
-    private LazyOptional<IEnergyStorage> energyInterface = LazyOptional.of(CapabilityEnergy.ENERGY::getDefaultInstance);
 
     public ChargerBlockTileEntity() {
         super(TYPE);
-        energyStorage = new ChargerBlockEnergy(100, 100, 100, 10);
+        energyStorage = new ChargerBlockEnergy();
     }
 
     @Override
@@ -51,29 +50,37 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
 
     @Override
     public ChargerBlockTileEntity get() {
-        return new ChargerBlockTileEntity();
-    }
-
-    @Override
-    public CompoundNBT getUpdateTag() {
-        return super.getUpdateTag();
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundNBT tag) {
-        write(tag);
+        return this;
     }
 
     @Override
     public void tick() {
+        acceptEnergy();
+    }
 
+    private void acceptEnergy() {
+        if (world == null || !energyStorage.canReceive() || !energyStorage.canAcceptEnergy()) {
+            return;
+        }
+
+        for (Direction direction : Direction.values()) {
+            TileEntity entity = world.getTileEntity(pos.offset(direction));
+            if (entity == null) continue;
+            LazyOptional<IEnergyStorage> entityCapability = entity.getCapability(CapabilityEnergy.ENERGY);
+            if (!entityCapability.isPresent()) continue;
+            IEnergyStorage entityEnergy = entityCapability.orElseThrow(IllegalStateException::new);
+            if (!entityEnergy.canExtract()) continue;
+
+            int energyAccepted = energyStorage.receiveEnergy(1, false);
+            entityEnergy.extractEnergy(energyAccepted, false);
+        }
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityEnergy.ENERGY) {
-            return energyInterface.cast();
+            return LazyOptional.of(CapabilityEnergy.ENERGY::getDefaultInstance).cast();
         } else {
             return super.getCapability(cap, side);
         }
