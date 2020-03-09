@@ -50,7 +50,7 @@ public class DronezMod {
     static Item diamondDroneBlade;
     static Item diamondDroneShell;
     static Item diamondDroneCore;
-    static SlabBlock chargingBlock;
+    static ChargerBlock chargingBlock;
     static BlockItem chargingBlockItem;
     static DroneSpawnEggItem ironDroneSpawnEgg;
     static DroneSpawnEggItem goldDroneSpawnEgg;

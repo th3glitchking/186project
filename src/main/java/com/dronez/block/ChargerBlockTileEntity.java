@@ -76,6 +76,10 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
         }
     }
 
+    public ChargerBlockEnergy getEnergyStorage() {
+        return energyStorage;
+    }
+
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {

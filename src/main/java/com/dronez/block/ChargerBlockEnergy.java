@@ -10,8 +10,10 @@ public class ChargerBlockEnergy extends EnergyStorage implements INBTSerializabl
     private static final String MAX_EXTRACT = "maxExtract";
     private static final String ENERGY = "energy";
 
+    private static final int K = 1000;
+
     public ChargerBlockEnergy() {
-        super(100, 100, 100, 10);
+        super(10 * K, 100, 100, 10 * K);
     }
 
     @Override

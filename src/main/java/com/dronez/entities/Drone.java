@@ -1,10 +1,12 @@
 package com.dronez.entities;
 
+import com.dronez.DronezUtils;
+import com.dronez.block.ChargerBlockEnergy;
+import com.dronez.block.ChargerBlockTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.LookRandomlyGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -16,7 +18,9 @@ import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -26,28 +30,34 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.EnergyStorage;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 //For now, this will be the pre-optimization Drone Entity class. Later, this class can easily be modified to support multiple Drone Types via inheritance.
 public class Drone extends FlyingEntity {
 
-    //add material type tracking and texture locations here
+    // Material type tracking and texture locations
     protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(Drone.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     protected static final DataParameter<Byte> SHELL = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     protected static final DataParameter<Byte> CORE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     protected static final DataParameter<Byte> BLADE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
+
+    // Energy tracking
     private EnergyStorage battery;
     private boolean charging;
 
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
         this.moveController = new MoveHelperController(this);
-
+        this.battery = new EnergyStorage(10000, 10000, 10000, 10000);
+        this.charging = false;
     }
 
     protected void registerAttributes() {
@@ -58,16 +68,47 @@ public class Drone extends FlyingEntity {
     }
 
     protected void registerGoals() {
-        //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
-        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
-        this.goalSelector.addGoal(5, new LookRandomlyGoal(this));
-        this.goalSelector.addGoal(7, new RandomFlyGoal(this));
+        this.goalSelector.addGoal(10, new ChargingGoal(this));
+    }
+
+    /**
+     * Returns whether the battery is below 1000 FE
+     * @return we need a charge ASAP
+     */
+    public boolean criticalCharge() {
+        return battery.getEnergyStored() < 1000;
+    }
+
+    /**
+     * Returns whether the battery is less than full energy
+     * @return energy is less than full
+     */
+    public boolean needsCharge() {
+        return battery.getEnergyStored() < battery.getMaxEnergyStored();
     }
 
     public void tick() {
         super.tick();
-        //and then add anything else that needs to be updated every tick
+
+        if (!charging) {
+            int previousEnergy = battery.getEnergyStored();
+            battery.extractEnergy(1, false);
+            if (battery.getEnergyStored() == 0 && previousEnergy != 0) {
+                // Just ran out of battery
+                if (!world.isRemote) {
+                    DronezUtils.droneSays("Shutting down...");
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the position of this entity as a BlockPos
+     * @return the current position
+     */
+    public BlockPos getPos() {
+        return new BlockPos(posX, posY, posZ);
     }
 
     protected void registerData() {
@@ -145,13 +186,16 @@ public class Drone extends FlyingEntity {
         return charging;
     }
 
-    public Drone initBattery(int capacity) {
-        this.battery = new EnergyStorage(capacity, capacity, capacity, capacity);
-        return this;
+    public void setCharging(boolean charging) {
+        this.charging = charging;
     }
 
+    public void addCharge(int amount) {
+        this.battery.receiveEnergy(amount, false);
+    }
+
+    @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        super.getHurtSound(damageSourceIn);
         return SoundEvents.ENTITY_BLAZE_HURT;
     }
 
@@ -299,19 +343,6 @@ public class Drone extends FlyingEntity {
         }
     }
 
-    static class Charge extends Goal {
-        protected EnergyStorage battery;
-
-        public Charge(EnergyStorage battery){
-
-        }
-
-        @Override
-        public boolean shouldExecute() {
-            return battery.getEnergyStored() < 100;
-        }
-    }
-
     static class RandomFlyGoal extends Goal {
         private final Drone parentEntity;
 
@@ -352,6 +383,118 @@ public class Drone extends FlyingEntity {
             double d1 = this.parentEntity.posY + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
             double d2 = this.parentEntity.posZ + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
             this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 1.0D);
+        }
+    }
+
+    /**
+     * A goal that:
+     * 1) Finds nearest charging block
+     * 2) Moves towards the charging block
+     * 3) Rests on the charging block until energy is restored
+     */
+    static class ChargingGoal extends Goal {
+        private final Drone drone;
+        private BlockPos targetPos;
+        private ChargerBlockEnergy energySource;
+
+        /**
+         * The amount of FE grabbed each tick by the Drone
+         */
+        private static final int ENERGY_ACCEPT_RATE = 10;
+
+        /**
+         * The block radius the Drone uses to scan for a Charger block.
+         */
+        private static final float SCAN_RADIUS = 100f;
+
+        /**
+         * Constructs a new goal governing charging of the Drone
+         * @param droneIn the drone
+         */
+        public ChargingGoal(Drone droneIn) {
+            EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
+            flags.add(Flag.MOVE);
+            this.setMutexFlags(flags);
+            drone = droneIn;
+        }
+
+        @Override
+        public boolean shouldExecute() {
+            return drone.criticalCharge();
+        }
+
+        @Override
+        public boolean shouldContinueExecuting() {
+            // If we don't need a charge anymore, we should exit
+            if (!drone.needsCharge()) {
+                DronezUtils.droneSays("I'm done charging!");
+                return false;
+            }
+
+            // If our target doesn't exist, we should exit
+            return targetPos != null;
+        }
+
+        @Override
+        public void startExecuting() {
+            DronezUtils.droneSays("I've reached critical battery level.");
+
+            Predicate<BlockPos> isChargerBlock = pos -> {
+                TileEntity te = drone.world.getTileEntity(pos);
+                if (te == null) return false;
+                return te instanceof ChargerBlockTileEntity;
+            };
+
+            // Scan for nearest ChargerBlock
+            BlockPos scanVertex1 = drone.getPos().add(-SCAN_RADIUS, -SCAN_RADIUS, -SCAN_RADIUS);
+            BlockPos scanVertex2 = drone.getPos().add(SCAN_RADIUS, SCAN_RADIUS, SCAN_RADIUS);
+            Stream<BlockPos> positions = BlockPos.getAllInBox(scanVertex1, scanVertex2);
+            Optional<BlockPos> nearestBlockPos = positions.filter(isChargerBlock).findFirst();
+            if (!nearestBlockPos.isPresent()) {
+                DronezUtils.droneSays("I couldn't find a charger less than %.0f blocks away.", SCAN_RADIUS);
+                LogManager.getLogger().info("COULDN'T FIND CHARGER");
+                return;
+            }
+
+            BlockPos blockPos = nearestBlockPos.get();
+            ChargerBlockTileEntity te = (ChargerBlockTileEntity) drone.world.getTileEntity(blockPos);
+            if (te == null) return;
+            targetPos = blockPos.offset(Direction.UP, 1);
+            energySource = te.getEnergyStorage();
+        }
+
+        /**
+         * This method checks if the current distance is close enough to the Tesla coil to charge.
+         * @return Drone is close enough to Charger Block to accept energy
+         */
+        private boolean isCloseEnough() {
+            return drone.getPos().distanceSq(targetPos) <= 4;
+        }
+
+        @Override
+        public void tick() {
+            if (targetPos == null) {
+                return;
+            }
+
+            if (isCloseEnough()) {
+                if (!drone.isCharging()) {
+                    DronezUtils.droneSays("I'm charging!");
+                    drone.setCharging(true);
+                }
+
+                // Grab energy
+                int grabbed = energySource.extractEnergy(ENERGY_ACCEPT_RATE, false);
+                drone.addCharge(grabbed);
+            } else {
+                if (drone.isCharging()) {
+                    drone.setCharging(false);
+                }
+
+                // Get closer to charger
+                drone.getMoveHelper().setMoveTo(targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1D);
+                DronezUtils.debug(String.format("(%s) -> (%s)", drone.getPos(), targetPos));
+            }
         }
     }
 }

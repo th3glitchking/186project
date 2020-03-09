@@ -2,6 +2,7 @@ package com.dronez.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FenceBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
@@ -10,7 +11,7 @@ import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nullable;
 
-public class ChargerBlock extends SlabBlock {
+public class ChargerBlock extends FenceBlock {
     public static final ChargerBlock CHARGER_BLOCK = new ChargerBlock();
 
     public static ResourceLocation IDENTIFIER = new ResourceLocation("dronez" ,"charger_block");
