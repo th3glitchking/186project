@@ -71,9 +71,9 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new StringTextComponent("Blades: " + blades));
-        tooltip.add(new StringTextComponent("Blade shell: " + shell));
-        tooltip.add(new StringTextComponent("Blade core: " + core));
+        tooltip.add(new StringTextComponent("Blades: " + blades.getMaterial()));
+        tooltip.add(new StringTextComponent("Blade shell: " + shell.getMaterial()));
+        tooltip.add(new StringTextComponent("Blade core: " + core.getMaterial()));
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
@@ -180,3 +180,4 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         return "Core: " + core.getMaterial() + " Shell: " + shell.getMaterial() + " Blades: " + blades.getMaterial() + " User: " + user;
     }
 }
+
