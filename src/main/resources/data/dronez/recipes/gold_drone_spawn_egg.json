@@ -2,21 +2,21 @@
     "type": "minecraft:crafting_shaped",
     "pattern":
     [
-        "x x",
-        " y ",
-        "xzx"
+        "bsb",
+        "scs",
+        "bsb"
     ],
     "key":
     {
-        "x":
+        "b":
         {
             "item": "dronez:gold_drone_blade"
         },
-        "y":
+        "s":
         {
             "item": "dronez:gold_drone_shell"
         },
-        "z":
+        "c":
         {
             "item": "dronez:gold_drone_core"
         }

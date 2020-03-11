@@ -48,8 +48,6 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD));
     public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND));
 
-
-
     public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, PartMaterial blades, PartMaterial shell, PartMaterial core)
     {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
         super(typeIn, primaryColorIn, secondaryColorIn, builder);
@@ -69,10 +67,7 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         Registry.register(Registry.ITEM, "dronez:iron_drone_spawn_egg", ironDroneSpawnEgg);
         Registry.register(Registry.ITEM, "dronez:gold_drone_spawn_egg", goldDroneSpawnEgg);
         Registry.register(Registry.ITEM, "dronez:diamond_drone_spawn_egg", diamondDroneSpawnEgg);
-
     }
-
-
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
@@ -81,7 +76,6 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         tooltip.add(new StringTextComponent("Blade core: " + core));
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
-
 
     @Override
     @MethodsReturnNonnullByDefault
@@ -185,5 +179,4 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     {
         return "Core: " + core.getMaterial() + " Shell: " + shell.getMaterial() + " Blades: " + blades.getMaterial() + " User: " + user;
     }
-
 }

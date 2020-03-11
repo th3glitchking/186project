@@ -3,16 +3,16 @@
     "pattern":
     [
         "   ",
-        "xyx",
+        "grg",
         "   "
     ],
     "key":
     {
-        "x":
+        "g":
         {
             "item": "minecraft:gold_ingot"
         },
-        "y":
+        "r":
         {
             "item": "minecraft:redstone"
         }

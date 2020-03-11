@@ -2,21 +2,21 @@
   "type": "minecraft:crafting_shaped",
   "pattern":
   [
-    "xcx",
-    "ycy",
-    "xxx"
+    "pgp",
+    "rgr",
+    "ppp"
   ],
   "key":
   {
-    "x":
+    "p":
     {
       "tag": "minecraft:planks"
     },
-    "y":
+    "r":
     {
       "item": "minecraft:redstone"
     },
-    "c":
+    "g":
     {
       "item": "minecraft:gold_ingot"
     }
