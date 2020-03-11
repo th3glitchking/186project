@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class DronezMod
 {
     // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 
     static Item ironDroneBlade;
     static Item ironDroneShell;

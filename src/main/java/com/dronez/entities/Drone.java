@@ -1,5 +1,6 @@
 package com.dronez.entities;
 
+import com.dronez.DronezMod;
 import com.dronez.PartMaterial;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -102,7 +103,9 @@ public class Drone extends FlyingEntity {
         compound.putBoolean("Charging", this.isCharging());
     }
     public void readAdditional(CompoundNBT compound) {
+        DronezMod.LOGGER.debug("OONGA BOONGA I WAS ABLE TO GET INTO READ ADDITIONAL FUCK YOU SCREEN\n\n\n\n\n\n\n\n REEEEEEE");
         super.readAdditional(compound);
+        DronezMod.LOGGER.debug("Testing in Drone.java readAdditional test: " + compound.getString("Owner"));
         String s;
         if (compound.contains("OwnerUUID", 8)) {
             s = compound.getString("OwnerUUID");
@@ -121,7 +124,7 @@ public class Drone extends FlyingEntity {
         this.dataManager.set(SHELL, compound.getByte("Shell"));
         this.dataManager.set(CORE, compound.getByte("Core"));
         this.dataManager.set(BLADE, compound.getByte("Blade"));
-
+        this.setOwnerId(this.world.getClosestPlayer(this, 100).getUniqueID());//for sam testing
     }
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
