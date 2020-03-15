@@ -1,6 +1,7 @@
 package com.dronez;
 
 import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.entities.AttackDrone;
 import com.dronez.entities.Drone;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
@@ -121,6 +122,7 @@ public class DronezMod
 
 
         public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
+        public static EntityType<Drone> attack = (EntityType<Drone>) EntityType.Builder.<Drone>create((AttackDrone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:attack_drone");
 
         private static void generateEntityTypes() {
             LOGGER.debug("Dronez: Creating EntityTypes...");
@@ -169,7 +171,7 @@ public class DronezMod
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
             LOGGER.debug("Dronez: Registering Entities...");
             event.getRegistry().registerAll(
-                    drone
+                    drone, attack
             );
         }
     }
