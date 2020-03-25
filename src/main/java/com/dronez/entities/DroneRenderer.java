@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public class DroneRenderer extends MobRenderer<Drone, DroneModel<Drone>> {
-    private static final ResourceLocation SKIN = new ResourceLocation("dronez:textures/drone.png");
+    private static final ResourceLocation SKIN = new ResourceLocation("dronez:textures/iron_drone.png");
 
     public DroneRenderer(EntityRendererManager renderManager) {
         //   (renderManager,               model,     shadowSize);
