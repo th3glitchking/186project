@@ -1,4 +1,4 @@
-package com.dronez.block;
+package com.dronez.block.charger;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -16,16 +16,8 @@ import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class ChargerBlockTileEntity extends TileEntity implements Supplier<ChargerBlockTileEntity>, ITickableTileEntity, ICapabilityProvider {
-    public static final TileEntityType<ChargerBlockTileEntity> TYPE = makeType();
+    public static final TileEntityType<ChargerBlockTileEntity> TYPE = (TileEntityType<ChargerBlockTileEntity>)TileEntityType.Builder.create(ChargerBlockTileEntity::new, ChargerBlock.CHARGER_BLOCK).build(null).setRegistryName("dronez", "charger_block");
     private static final String COMPOUND_ENERGY_NAME = "Energy";
-
-    private static TileEntityType<ChargerBlockTileEntity> makeType() {
-        TileEntityType.Builder<ChargerBlockTileEntity> builder = TileEntityType.Builder.create(ChargerBlockTileEntity::new, ChargerBlock.CHARGER_BLOCK);
-        TileEntityType<ChargerBlockTileEntity> type = builder.build(null);
-        TileEntityType<? extends TileEntity> withName = type.setRegistryName("dronez", "charger_block");
-
-        return (TileEntityType<ChargerBlockTileEntity>)withName;
-    }
 
     private ChargerBlockEnergy energyStorage;
 

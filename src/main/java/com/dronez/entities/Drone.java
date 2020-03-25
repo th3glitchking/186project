@@ -1,8 +1,8 @@
 package com.dronez.entities;
 
 import com.dronez.DronezUtils;
-import com.dronez.block.ChargerBlockEnergy;
-import com.dronez.block.ChargerBlockTileEntity;
+import com.dronez.block.charger.ChargerBlockEnergy;
+import com.dronez.block.charger.ChargerBlockTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;

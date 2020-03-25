@@ -1,23 +1,34 @@
 package com.dronez;
 
 import com.dronez.Items.DroneSpawnEggItem;
-import com.dronez.block.ChargerBlock;
-import com.dronez.block.ChargerBlockTileEntity;
+import com.dronez.block.charger.ChargerBlock;
+import com.dronez.block.charger.ChargerBlockTileEntity;
+import com.dronez.block.workshop.WorkshopBlock;
+import com.dronez.block.workshop.WorkshopContainer;
+import com.dronez.block.workshop.WorkshopScreen;
+import com.dronez.block.workshop.WorkshopTileEntity;
 import com.dronez.entities.Drone;
 import com.dronez.entities.RenderDroneFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.SlabBlock;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,6 +41,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.IContainerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,6 +64,8 @@ public class DronezMod {
     static Item diamondDroneCore;
     static ChargerBlock chargingBlock;
     static BlockItem chargingBlockItem;
+    static WorkshopBlock workshopBlock;
+    static BlockItem workshopBlockItem;
     static DroneSpawnEggItem ironDroneSpawnEgg;
     static DroneSpawnEggItem goldDroneSpawnEgg;
     static DroneSpawnEggItem diamondDroneSpawnEgg;
@@ -88,6 +102,7 @@ public class DronezMod {
         LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
         OBJLoader.INSTANCE.addDomain("dronez");
         RenderingRegistry.registerEntityRenderingHandler(Drone.class, RenderDroneFactory.INSTANCE);
+        ScreenManager.registerFactory(WorkshopContainer.TYPE, WorkshopScreen::new);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
@@ -127,7 +142,8 @@ public class DronezMod {
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             chargingBlock = (ChargerBlock)ChargerBlock.CHARGER_BLOCK.setRegistryName("dronez", "charging_block");
-            blockRegistryEvent.getRegistry().registerAll(chargingBlock);
+            workshopBlock = (WorkshopBlock)WorkshopBlock.WORKSHOP_BLOCK.setRegistryName("dronez", "workshop_block");
+            blockRegistryEvent.getRegistry().registerAll(chargingBlock, workshopBlock);
         }
 
         @SubscribeEvent
@@ -141,13 +157,14 @@ public class DronezMod {
             diamondDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_blade");
             diamondDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_shell");
             diamondDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_core");
-            chargingBlockItem = (BlockItem)new BlockItem(chargingBlock, new Item.Properties().group(dronezGroup)).setRegistryName("dronez:charging_block_item");
+            chargingBlockItem = (BlockItem)new BlockItem(chargingBlock, new Item.Properties().group(dronezGroup)).setRegistryName("dronez", "charging_block_item");
+            workshopBlockItem = (BlockItem)new BlockItem(workshopBlock, new Item.Properties().group(dronezGroup)).setRegistryName("dronez", "workshop_block_item");
 
             event.getRegistry().registerAll(
                     ironDroneBlade,ironDroneShell,ironDroneCore,
                     goldDroneBlade, goldDroneShell, goldDroneCore,
                     diamondDroneBlade,diamondDroneCore,diamondDroneShell,
-                    chargingBlockItem
+                    chargingBlockItem, workshopBlockItem
             );
             DroneSpawnEggItem.registerEggs();
         }
@@ -161,8 +178,13 @@ public class DronezMod {
         }
 
         @SubscribeEvent
-        public static void registerTE(RegistryEvent.Register<TileEntityType<?>> evt) {
-            evt.getRegistry().register(ChargerBlockTileEntity.TYPE);
+        public static void registerTE(RegistryEvent.Register<TileEntityType<?>> event) {
+            event.getRegistry().registerAll(ChargerBlockTileEntity.TYPE, WorkshopTileEntity.TYPE);
+        }
+
+        @SubscribeEvent
+        public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
+            event.getRegistry().register(WorkshopContainer.TYPE);
         }
     }
 

@@ -1,9 +1,8 @@
-package com.dronez.block;
+package com.dronez.block.charger;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FenceBlock;
-import net.minecraft.block.SlabBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;

@@ -11,5 +11,6 @@
   "item.dronez.iron_drone_spawn_egg": "Drone Spawn Egg",
   "item.dronez.gold_drone_spawn_egg": "Drone Spawn Egg",
   "item.dronez.diamond_drone_spawn_egg": "Drone Spawn Egg",
-  "block.dronez.charging_block": "Drone Charging Block"
+  "block.dronez.charging_block": "Drone Charger",
+  "block.dronez.workshop_block": "Drone Workshop"
 }

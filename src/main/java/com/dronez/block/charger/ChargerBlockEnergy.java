@@ -1,4 +1,4 @@
-package com.dronez.block;
+package com.dronez.block.charger;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
