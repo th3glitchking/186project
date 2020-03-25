@@ -35,7 +35,7 @@ public class WorkshopTileEntity extends TileEntity implements INamedContainerPro
     @Nullable
     @Override
     @ParametersAreNonnullByDefault
-    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new WorkshopContainer(i, playerEntity.world, pos, playerInventory);
+    public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new WorkshopContainer(id, playerEntity.world, pos, playerInventory);
     }
 }
