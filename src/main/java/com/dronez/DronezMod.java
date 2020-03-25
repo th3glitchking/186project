@@ -1,6 +1,7 @@
 package com.dronez;
 
 import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.entities.AttackDrone;
 import com.dronez.block.charger.ChargerBlock;
 import com.dronez.block.charger.ChargerBlockTileEntity;
 import com.dronez.block.workshop.WorkshopBlock;
@@ -128,7 +129,10 @@ public class DronezMod {
     // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
-        public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).size(1,0.25f).build("drone").setRegistryName("dronez:drone");
+
+
+        public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
+        public static EntityType<Drone> attack = (EntityType<Drone>) EntityType.Builder.<Drone>create((AttackDrone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:attack_drone");
 
         private static void generateEntityTypes() {
             LOGGER.debug("Dronez: Creating EntityTypes...");
@@ -173,7 +177,7 @@ public class DronezMod {
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
             LOGGER.debug("Dronez: Registering Entities...");
             event.getRegistry().registerAll(
-                    drone
+                    drone, attack
             );
         }
 

@@ -5,6 +5,7 @@ import com.dronez.block.charger.ChargerBlockEnergy;
 import com.dronez.block.charger.ChargerBlockTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,12 +28,15 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.EnergyStorage;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
+import java.util.*;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Random;
@@ -69,6 +73,7 @@ public class Drone extends FlyingEntity {
 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
+        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
     }
 
@@ -145,21 +150,28 @@ public class Drone extends FlyingEntity {
             s = compound.getString("OwnerUUID");
         } else {
             String s1 = compound.getString("Owner");
-            s = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.getServer(), s1);
+            s = PreYggdrasilConverter.convertMobOwnerIfNeeded(Objects.requireNonNull(this.getServer()), s1);
         }
 
         if (!s.isEmpty()) {
             try {
                 this.setOwnerId(UUID.fromString(s));
             } catch (Throwable var4) {
-                this.setOwnerId(this.world.getClosestPlayer(this, 100).getUniqueID());
+                this.setOwnerId(Objects.requireNonNull(this.world.getClosestPlayer(this, 100)).getUniqueID());
             }
         }
 
         this.dataManager.set(SHELL, compound.getByte("Shell"));
         this.dataManager.set(CORE, compound.getByte("Core"));
         this.dataManager.set(BLADE, compound.getByte("Blade"));
-        this.setOwnerId(this.world.getClosestPlayer(this, 100).getUniqueID());//for sam testing
+        super.readAdditional(compound);
+    }
+
+    @Override
+    @Nullable
+    public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+        if(dataTag != null) this.readAdditional(dataTag);
+        return spawnDataIn;
     }
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
@@ -346,48 +358,6 @@ public class Drone extends FlyingEntity {
         }
     }
 
-    static class RandomFlyGoal extends Goal {
-        private final Drone parentEntity;
-
-        public RandomFlyGoal(Drone drone) {
-            this.parentEntity = drone;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
-        }
-
-        /**
-         * Returns whether the EntityAIBase should begin execution.
-         */
-        public boolean shouldExecute() {
-            MovementController movementcontroller = this.parentEntity.getMoveHelper();
-            if (!movementcontroller.isUpdating()) {
-                return true;
-            } else {
-                double d0 = movementcontroller.getX() - this.parentEntity.posX;
-                double d1 = movementcontroller.getY() - this.parentEntity.posY;
-                double d2 = movementcontroller.getZ() - this.parentEntity.posZ;
-                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-                return d3 < 1.0D || d3 > 3600.0D;
-            }
-        }
-
-        /**
-         * Returns whether an in-progress EntityAIBase should continue executing
-         */
-        public boolean shouldContinueExecuting() {
-            return false;
-        }
-
-        /**
-         * Execute a one shot task or start executing a continuous task
-         */
-        public void startExecuting() {
-            Random random = this.parentEntity.getRNG();
-            double d0 = this.parentEntity.posX + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-            double d1 = this.parentEntity.posY + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-            double d2 = this.parentEntity.posZ + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-            this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 1.0D);
-        }
-    }
 
     /**
      * A goal that:
