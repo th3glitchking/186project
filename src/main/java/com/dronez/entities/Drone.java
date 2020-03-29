@@ -60,7 +60,7 @@ public class Drone extends FlyingEntity {
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
         this.moveController = new MoveHelperController(this);
-        this.battery = new EnergyStorage(10000, 10000, 10000, 10000);
+        this.battery = new EnergyStorage(10000, 10000, 10000, 1200);
         this.charging = false;
     }
 
@@ -408,24 +408,25 @@ public class Drone extends FlyingEntity {
             return targetPos != null;
         }
 
+        /**
+         * Checks whether or not the TileEntity at a BlockPos is a Charger Block
+         * @param pos the position in the world to check
+         * @return true if the block at pos is a Charger Block
+         */
+        private boolean isChargerBlock(BlockPos pos) {
+            TileEntity te = drone.world.getTileEntity(pos);
+            if (te == null) return false;
+            return te instanceof ChargerBlockTileEntity;
+        }
+
         @Override
         public void startExecuting() {
-            DronezUtils.droneSays("I've reached critical battery level.");
-
-            Predicate<BlockPos> isChargerBlock = pos -> {
-                TileEntity te = drone.world.getTileEntity(pos);
-                if (te == null) return false;
-                return te instanceof ChargerBlockTileEntity;
-            };
-
             // Scan for nearest ChargerBlock
             BlockPos scanVertex1 = drone.getPos().add(-SCAN_RADIUS, -SCAN_RADIUS, -SCAN_RADIUS);
             BlockPos scanVertex2 = drone.getPos().add(SCAN_RADIUS, SCAN_RADIUS, SCAN_RADIUS);
             Stream<BlockPos> positions = BlockPos.getAllInBox(scanVertex1, scanVertex2);
-            Optional<BlockPos> nearestBlockPos = positions.filter(isChargerBlock).findFirst();
+            Optional<BlockPos> nearestBlockPos = positions.filter(this::isChargerBlock).findFirst();
             if (!nearestBlockPos.isPresent()) {
-                DronezUtils.droneSays("I couldn't find a charger less than %.0f blocks away.", SCAN_RADIUS);
-                LogManager.getLogger().info("COULDN'T FIND CHARGER");
                 return;
             }
 
@@ -437,7 +438,7 @@ public class Drone extends FlyingEntity {
         }
 
         /**
-         * This method checks if the current distance is close enough to the Tesla coil to charge.
+         * This method checks if the current distance is close enough to the Charger Block to charge.
          * @return Drone is close enough to Charger Block to accept energy
          */
         private boolean isCloseEnough() {
