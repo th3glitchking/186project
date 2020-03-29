@@ -8,8 +8,8 @@ import com.dronez.block.workshop.WorkshopBlock;
 import com.dronez.block.workshop.WorkshopContainer;
 import com.dronez.block.workshop.WorkshopScreen;
 import com.dronez.block.workshop.WorkshopTileEntity;
-import com.dronez.entities.Drone;
-import com.dronez.entities.RenderDroneFactory;
+import com.dronez.entities.*;
+import com.dronez.entities.storage.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -130,9 +130,9 @@ public class DronezMod {
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
 
-
         public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
         public static EntityType<Drone> attack = (EntityType<Drone>) EntityType.Builder.<Drone>create((AttackDrone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:attack_drone");
+        public static EntityType<Drone> storage = (EntityType<Drone>) EntityType.Builder.<Drone>create((StorageDrone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:storage_drone");
 
         private static void generateEntityTypes() {
             LOGGER.debug("Dronez: Creating EntityTypes...");
@@ -177,7 +177,7 @@ public class DronezMod {
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
             LOGGER.debug("Dronez: Registering Entities...");
             event.getRegistry().registerAll(
-                    drone, attack
+                    drone, attack, storage
             );
         }
 
@@ -188,7 +188,7 @@ public class DronezMod {
 
         @SubscribeEvent
         public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
-            event.getRegistry().register(WorkshopContainer.TYPE);
+            event.getRegistry().registerAll(WorkshopContainer.TYPE, StorageContainer.TYPE);
         }
     }
 
