@@ -27,9 +27,7 @@ public class AttackDrone extends Drone {
 
     @Override
     protected void registerGoals() {
-        //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
-        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
-        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
+        super.registerGoals();
         this.goalSelector.addGoal(3, new AttackDrone.OwnerHurtByTargetGoal(this));
     }
 
