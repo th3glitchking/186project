@@ -367,6 +367,7 @@ public class Drone extends FlyingEntity {
      */
     static class ChargingGoal extends Goal {
         private final Drone drone;
+        private BlockPos chargerPos;
         private BlockPos targetPos;
         private ChargerBlockEnergy energySource;
 
@@ -405,7 +406,18 @@ public class Drone extends FlyingEntity {
             }
 
             // If our target doesn't exist, we should exit
-            return targetPos != null;
+            if (targetPos == null) {
+                return false;
+            }
+
+            // If the block disappears, stop charging
+            TileEntity te = drone.world.getTileEntity(chargerPos);
+            if (!(te instanceof ChargerBlockTileEntity)) {
+//                DronezUtils.droneSays("Hm, I've lost the charger!");
+                return false;
+            }
+
+            return true;
         }
 
         /**
@@ -433,6 +445,7 @@ public class Drone extends FlyingEntity {
             BlockPos blockPos = nearestBlockPos.get();
             ChargerBlockTileEntity te = (ChargerBlockTileEntity) drone.world.getTileEntity(blockPos);
             if (te == null) return;
+            chargerPos = blockPos;
             targetPos = blockPos.offset(Direction.UP, 1);
             energySource = te.getEnergyStorage();
         }
@@ -467,7 +480,7 @@ public class Drone extends FlyingEntity {
 
                 // Get closer to charger
                 drone.getMoveHelper().setMoveTo(targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1D);
-                DronezUtils.debug(String.format("(%s) -> (%s)", drone.getPos(), targetPos));
+//                DronezUtils.debug(String.format("(%s) -> (%s)", drone.getPos(), targetPos));
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.dronez.block.workshop;
 
+import com.dronez.DronezMod;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -7,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
 public class WorkshopScreen extends ContainerScreen<WorkshopContainer> {
-    private ResourceLocation ASSEMBLE_GUI = new ResourceLocation("dronez", "textures/gui/workshop_assemble.png");
+    private ResourceLocation ASSEMBLE_GUI = new ResourceLocation(DronezMod.MODID, "textures/gui/workshop_assemble.png");
 
     public WorkshopScreen(WorkshopContainer screenContainer, PlayerInventory inv, ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);
