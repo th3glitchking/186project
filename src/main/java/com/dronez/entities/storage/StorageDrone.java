@@ -57,7 +57,9 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
         ItemStack itemstack = player.getHeldItem(hand);
         Item item = itemstack.getItem();
         if(itemstack.isEmpty() || item.isFood()){
-            NetworkHooks.openGui((ServerPlayerEntity)player, this, this.getPos());
+            if(!this.world.isRemote) {
+                NetworkHooks.openGui((ServerPlayerEntity) player, this);
+            }
         }
         return super.processInteract(player, hand);
     }

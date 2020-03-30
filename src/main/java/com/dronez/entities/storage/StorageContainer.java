@@ -20,7 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class StorageContainer extends Container {
     public static ContainerType<StorageContainer> TYPE = (ContainerType<StorageContainer>) IForgeContainerType.create((windowId, inv, data) -> {
         return new StorageContainer(windowId, Minecraft.getInstance().world, inv);
-    }).setRegistryName("dronez", "workshop_block");
+    }).setRegistryName("dronez", "storage_container");
 
     private StorageDrone drone;
     private InvWrapper inv;
