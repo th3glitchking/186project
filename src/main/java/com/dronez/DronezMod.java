@@ -202,6 +202,9 @@ public class DronezMod {
             if (obj instanceof ChargerBlockTileEntity) {
                 ChargerBlockTileEntity entity = (ChargerBlockTileEntity)obj;
                 event.addCapability(ChargerBlock.IDENTIFIER, entity);
+            } else if (obj instanceof WorkshopTileEntity) {
+                WorkshopTileEntity entity = (WorkshopTileEntity)obj;
+                event.addCapability(WorkshopBlock.IDENTIFIER, entity);
             }
         }
     }

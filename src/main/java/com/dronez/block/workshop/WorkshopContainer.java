@@ -23,13 +23,15 @@ public class WorkshopContainer extends Container {
 
     private WorkshopTileEntity te;
     private InvWrapper inv;
+    private WorkshopItemHandler itemInv;
 
     public WorkshopContainer(int id, World world, BlockPos pos, PlayerInventory playerInventory) {
-            super(TYPE, id);
-            this.te = (WorkshopTileEntity)world.getTileEntity(pos);
-            this.inv = new InvWrapper(playerInventory);
+        super(TYPE, id);
+        this.te = (WorkshopTileEntity)world.getTileEntity(pos);
+        this.inv = new InvWrapper(playerInventory);
+        this.itemInv = new WorkshopItemHandler();
 
-        layoutPlayedInventorySlots(10, 70);
+        layoutPlayedInventorySlots(8, 84);
     }
 
     @Override
@@ -59,13 +61,18 @@ public class WorkshopContainer extends Container {
 
     private void layoutPlayedInventorySlots(int leftCol, int topRow) {
         // Player inventory
-        int index = addSlotBox(inv, 9, leftCol, topRow, 9, 18, 3, 18);
+        addSlotBox(inv, 9, leftCol, topRow, 9, 18, 3, 18);
 
         // Hotbar
         topRow += 58;
         addSlotRange(inv, 0, leftCol, topRow, 9, 18);
 
         // Workshop slots
-        addSlot(new SlotItemHandler(inv, index, 64, 24));
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.TOP_LEFT_BLADE, 30, 17)); // Top left blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.SHELL, 48, 17)); // Shell
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.TOP_RIGHT_BLADE, 66, 17)); // Top right blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.CORE, 48, 35)); // Core
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_LEFT_BLADE, 30, 53)); // Bottom left blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_RIGHT_BLADE, 66, 53)); // Bottom right blade
     }
 }
