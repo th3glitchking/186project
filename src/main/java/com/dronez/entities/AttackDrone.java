@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.ai.goal.TargetGoal;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.monster.GhastEntity;
@@ -13,6 +14,7 @@ import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.horse.AbstractHorseEntity;
+import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
@@ -27,8 +29,17 @@ public class AttackDrone extends Drone {
 
     @Override
     protected void registerGoals() {
+<<<<<<< HEAD
+        //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
+        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
+        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
+        this.goalSelector.addGoal(3, new AttackDrone.DefendTargetGoal(this));
+        this.goalSelector.addGoal(3, new AttackDrone.TargetHurtByOwnerGoal(this));
+
+=======
         super.registerGoals();
         this.goalSelector.addGoal(3, new AttackDrone.OwnerHurtByTargetGoal(this));
+>>>>>>> 291e790362e129701d5df31f936abf77c6bc5110
     }
 
     public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner) {
@@ -49,7 +60,19 @@ public class AttackDrone extends Drone {
         }
     }
 
-    public class OwnerHurtByTargetGoal extends TargetGoal {
+    static class DefendTargetGoal extends NearestAttackableTargetGoal<WolfEntity> {
+        public DefendTargetGoal(AttackDrone drone) {
+            super(drone, WolfEntity.class, 16, false, true, (p_220789_0_) -> {
+                return !((WolfEntity)p_220789_0_).isTamed();//may not be the best thing in the world
+            });
+        }
+
+        protected double getTargetDistance() {
+            return super.getTargetDistance() * 0.25D;
+        }
+    }
+
+    /*public class OwnerHurtByTargetGoal extends TargetGoal {
         private final AttackDrone drone;
         private LivingEntity attacker;
         private int timestamp;
@@ -60,9 +83,9 @@ public class AttackDrone extends Drone {
             this.setMutexFlags(EnumSet.of(Goal.Flag.TARGET));
         }
 
-        /**
-         * Returns whether the EntityAIBase should begin execution.
-         */
+
+         //Returns whether the EntityAIBase should begin execution.
+
         public boolean shouldExecute() {
             if (!this.drone.isCharging()) {
                 LivingEntity livingentity = this.drone.getOwner();
@@ -78,9 +101,9 @@ public class AttackDrone extends Drone {
             }
         }
 
-        /**
-         * Execute a one shot task or start executing a continuous task
-         */
+
+         // Execute a one shot task or start executing a continuous task
+
         public void startExecuting() {
             this.goalOwner.setAttackTarget(this.attacker);
             LivingEntity livingentity = this.drone.getOwner();
@@ -91,5 +114,33 @@ public class AttackDrone extends Drone {
             super.startExecuting();
         }
 
+    }*/
+    public class TargetHurtByOwnerGoal extends TargetGoal{
+        private final AttackDrone drone;
+        private LivingEntity attacker;
+        private int timestamp;
+
+
+        public TargetHurtByOwnerGoal(AttackDrone theAttackingDroneIn) {
+            super(theAttackingDroneIn, false);
+            this.drone = theAttackingDroneIn;
+            this.setMutexFlags(EnumSet.of(Goal.Flag.TARGET));
+        }
+
+        @Override
+        public boolean shouldExecute() {
+            if (!this.drone.isCharging()) {
+                LivingEntity livingentity = this.drone.getOwner();
+                if (livingentity == null) {
+                    return false;
+                } else {//Not sure about what is in the else
+                    this.attacker = livingentity.getRevengeTarget();
+                    int i = livingentity.getRevengeTimer();
+                    return i != this.timestamp && this.isSuitableTarget(this.attacker, EntityPredicate.DEFAULT) && this.drone.shouldAttackEntity(this.attacker, livingentity);
+                }
+            } else {
+                return false;
+            }
+        }
     }
 }

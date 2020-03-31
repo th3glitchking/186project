@@ -170,9 +170,13 @@ public class Drone extends FlyingEntity {
     @Override
     @Nullable
     public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+        spawnDataIn = super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
         if(dataTag != null) this.readAdditional(dataTag);
         return spawnDataIn;
+
+
     }
+
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 0.3F;
