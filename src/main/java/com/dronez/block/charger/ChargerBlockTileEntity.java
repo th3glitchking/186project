@@ -1,6 +1,8 @@
 package com.dronez.block.charger;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -41,6 +43,11 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
     }
 
     @Override
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+        read(pkt.getNbtCompound());
+    }
+
+    @Override
     public ChargerBlockTileEntity get() {
         return this;
     }
@@ -78,7 +85,7 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
         if (cap == CapabilityEnergy.ENERGY) {
             return LazyOptional.of(CapabilityEnergy.ENERGY::getDefaultInstance).cast();
         } else {
-            return super.getCapability(cap, side);
+            return LazyOptional.empty();
         }
     }
 }

@@ -2,7 +2,7 @@
   "forgeMarker": 1,
   "variants": {
     "": [
-      { "model": "dronez:block/charging_block" }
+      { "model": "dronez:block/charger_block" }
     ]
   }
 }

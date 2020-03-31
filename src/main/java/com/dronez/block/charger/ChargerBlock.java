@@ -1,5 +1,6 @@
 package com.dronez.block.charger;
 
+import com.dronez.DronezMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FenceBlock;
@@ -12,8 +13,8 @@ import javax.annotation.Nullable;
 
 public class ChargerBlock extends FenceBlock {
     public static final ChargerBlock CHARGER_BLOCK = new ChargerBlock();
-
-    public static ResourceLocation IDENTIFIER = new ResourceLocation("dronez" ,"charger_block");
+    public static final String REGISTRY_NAME = "charger_block";
+    public static ResourceLocation IDENTIFIER = new ResourceLocation(DronezMod.MODID, REGISTRY_NAME);
 
     private ChargerBlock() {
         super(Block.Properties.create(Material.GLASS));

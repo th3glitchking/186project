@@ -1,5 +1,6 @@
 package com.dronez.block.workshop;
 
+import com.dronez.DronezMod;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -22,8 +23,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 public class WorkshopBlock extends ContainerBlock {
     public static final WorkshopBlock WORKSHOP_BLOCK = new WorkshopBlock();
-
-    public static ResourceLocation IDENTIFIER = new ResourceLocation("dronez" ,"workshop_block");
+    public static final String REGISTRY_NAME = "workshop_block";
+    public static ResourceLocation IDENTIFIER = new ResourceLocation(DronezMod.MODID, REGISTRY_NAME);
 
     public WorkshopBlock() {
         super(Block.Properties.create(Material.GLASS));

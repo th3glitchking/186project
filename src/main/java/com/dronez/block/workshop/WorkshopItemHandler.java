@@ -1,25 +1,97 @@
 package com.dronez.block.workshop;
 
+import com.dronez.DronezMod;
+import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.PartMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Map;
 
-public class WorkshopItemHandler implements IItemHandler {
+public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable {
     public static final int TOP_LEFT_BLADE = 500;
     public static final int TOP_RIGHT_BLADE = 501;
     public static final int BOTTOM_LEFT_BLADE = 502;
     public static final int BOTTOM_RIGHT_BLADE = 503;
     public static final int SHELL = 504;
     public static final int CORE = 505;
+    public static final int OUTPUT = 506;
 
     private HashMap<Integer, ItemStack> itemStacks;
 
     public WorkshopItemHandler() {
         this.itemStacks = new HashMap<>();
+        itemStacks.put(TOP_LEFT_BLADE, ItemStack.EMPTY);
+        itemStacks.put(TOP_RIGHT_BLADE, ItemStack.EMPTY);
+        itemStacks.put(BOTTOM_LEFT_BLADE, ItemStack.EMPTY);
+        itemStacks.put(BOTTOM_RIGHT_BLADE, ItemStack.EMPTY);
+        itemStacks.put(SHELL, ItemStack.EMPTY);
+        itemStacks.put(CORE, ItemStack.EMPTY);
+        itemStacks.put(OUTPUT, ItemStack.EMPTY);
+    }
+
+    /**
+     * TODO
+     * Called each time an item is inserted /extracted. Determine if
+     * the current items on the Workshop are able to build an output.
+     */
+    @Nullable
+    private DroneSpawnEggItem determineOutput() {
+        PartMaterial material = null;
+
+        for (Map.Entry<Integer, ItemStack> entry : itemStacks.entrySet()) {
+            // If this is the output slot, ignore
+            if (entry.getKey() == OUTPUT) {
+                continue;
+            }
+
+            // Make sure there are no EMPTY stacks
+            if (entry.getValue() == ItemStack.EMPTY) {
+                return null;
+            }
+
+            final ItemStack stack = entry.getValue();
+            PartMaterial mat = PartMaterial.fromItem(stack.getItem());
+            if (mat == null) {
+                // This item isn't part of our mod
+                return null;
+            }
+
+            // Make sure they're all the same material
+            if (material == null) {
+                // First item to be read
+                material = mat;
+            } else {
+                if (!material.equals(mat)) {
+                    // Not of the material as all the others
+                    return null;
+                }
+            }
+        }
+
+        if (material == null) {
+            return null;
+        }
+
+        // All of the items are placed and same material. Produce Drone of same material
+        return material.getEgg();
+    }
+
+    public void attemptProduceOutput() {
+        DroneSpawnEggItem egg = determineOutput();
+        if (egg == null) {
+            itemStacks.put(OUTPUT, ItemStack.EMPTY);
+            return;
+        }
+
+        ItemStack outputStack = new ItemStack(egg, 1);
+        itemStacks.put(OUTPUT, outputStack);
     }
 
     /**
@@ -74,17 +146,14 @@ public class WorkshopItemHandler implements IItemHandler {
     @Nonnull
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (itemStacks.get(slot) != null) {
+        if (itemStacks.get(slot) != ItemStack.EMPTY) {
             return stack;
         }
 
-        ItemStack copy = stack.copy();
-        ItemStack insert = copy.split(1);
-        if (!simulate) {
-            itemStacks.put(slot, insert);
-        }
+        itemStacks.put(slot, stack);
+        attemptProduceOutput();
 
-        return copy;
+        return ItemStack.EMPTY;
     }
 
     /**
@@ -104,12 +173,20 @@ public class WorkshopItemHandler implements IItemHandler {
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         ItemStack returnValue = itemStacks.get(slot);
-        if (returnValue == null) {
-            return ItemStack.EMPTY;
+        if (returnValue == ItemStack.EMPTY) {
+            return returnValue;
         }
 
         if (!simulate) {
-            itemStacks.put(slot, null);
+            itemStacks.put(slot, ItemStack.EMPTY);
+            if (slot != OUTPUT) attemptProduceOutput();
+        }
+
+        if (slot == OUTPUT) {
+            // Wipe board clean (except output)
+            itemStacks.entrySet().stream()
+                    .filter(e -> e.getKey() != OUTPUT)
+                    .forEach(e -> itemStacks.put(e.getKey(), ItemStack.EMPTY));
         }
 
         return returnValue;
@@ -148,16 +225,29 @@ public class WorkshopItemHandler implements IItemHandler {
     @Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
         if (slot == TOP_LEFT_BLADE || slot == TOP_RIGHT_BLADE || slot == BOTTOM_LEFT_BLADE || slot == BOTTOM_RIGHT_BLADE) {
-            // TODO - return if stack is a blade
-            return true;
+            return stack.getItem() == DronezMod.ironDroneBlade || stack.getItem() == DronezMod.goldDroneBlade || stack.getItem() == DronezMod.diamondDroneBlade;
         } else if (slot == SHELL) {
-            // TODO - return if stack is a shell
-            return true;
+            return stack.getItem() == DronezMod.ironDroneShell || stack.getItem() == DronezMod.goldDroneShell || stack.getItem() == DronezMod.diamondDroneShell;
         } else if (slot == CORE) {
-            // TODO - return if stack is a core
-            return true;
+            return stack.getItem() == DronezMod.ironDroneCore || stack.getItem() == DronezMod.goldDroneCore || stack.getItem() == DronezMod.diamondDroneCore;
         }
 
         return false;
+    }
+
+    /**
+     * Overrides the stack in the given slot. This method is used by the
+     * standard Forge helper methods and classes. It is not intended for
+     * general use by other mods, and the handler may throw an error if it
+     * is called unexpectedly.
+     *
+     * @param slot  Slot to modify
+     * @param stack ItemStack to set slot to (may be empty).
+     * @throws RuntimeException if the handler is called in a way that the handler
+     *                          was not expecting.
+     **/
+    @Override
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+        itemStacks.put(slot, stack);
     }
 }
