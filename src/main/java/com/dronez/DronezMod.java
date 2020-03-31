@@ -1,6 +1,7 @@
 package com.dronez;
 
 import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.Items.EggFactory;
 import com.dronez.entities.AttackDrone;
 import com.dronez.block.charger.ChargerBlock;
 import com.dronez.block.charger.ChargerBlockTileEntity;
@@ -163,7 +164,7 @@ public class DronezMod {
                     diamondDroneBlade,diamondDroneCore,diamondDroneShell,
                     chargerBlockItem, workshopBlockItem
             );
-            DroneSpawnEggItem.registerEggs();
+            EggFactory.registerEggs();
         }
 
         @SubscribeEvent

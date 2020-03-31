@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class PartMaterial {
 
-    public static final byte IRON = 1, GOLD = 2, DIAMOND = 3;
+    public static final PartMaterial IRON = new PartMaterial((byte) 1), GOLD = new PartMaterial((byte) 2), DIAMOND = new PartMaterial((byte) 3);
 
     private byte material;
 
@@ -27,26 +27,6 @@ public class PartMaterial {
                 return "gold";
             case 3:
                 return "diamond";
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Get the type of Drone to be made from this material.
-     *
-     * Returns null if material is not set.
-     * @return drone spawn egg of this type of material
-     */
-    @Nullable
-    public DroneSpawnEggItem getEgg() {
-        switch (material) {
-            case IRON:
-                return DroneSpawnEggItem.ironDroneSpawnEgg;
-            case GOLD:
-                return DroneSpawnEggItem.goldDroneSpawnEgg;
-            case DIAMOND:
-                return DroneSpawnEggItem.diamondDroneSpawnEgg;
             default:
                 return null;
         }
@@ -81,11 +61,11 @@ public class PartMaterial {
     @Nullable
     public static PartMaterial fromItem(Item item) {
         if (item == DronezMod.ironDroneBlade || item == DronezMod.ironDroneCore || item == DronezMod.ironDroneShell) {
-            return new PartMaterial(IRON);
+            return IRON;
         } else if (item == DronezMod.goldDroneBlade || item == DronezMod.goldDroneCore || item == DronezMod.goldDroneShell) {
-            return new PartMaterial(GOLD);
+            return GOLD;
         } else if (item == DronezMod.diamondDroneBlade || item == DronezMod.diamondDroneCore || item == DronezMod.diamondDroneShell) {
-            return new PartMaterial(DIAMOND);
+            return DIAMOND;
         }
 
         return null;

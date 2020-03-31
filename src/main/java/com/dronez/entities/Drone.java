@@ -199,6 +199,9 @@ public class Drone extends FlyingEntity {
             return null;
         }
     }
+    public byte getShell() {
+        return this.dataManager.get(SHELL);
+    }
 
     public boolean isCharging() {
         return charging;

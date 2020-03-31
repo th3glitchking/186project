@@ -2,6 +2,7 @@ package com.dronez.block.workshop;
 
 import com.dronez.DronezMod;
 import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.Items.EggFactory;
 import com.dronez.PartMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -80,7 +81,7 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
         }
 
         // All of the items are placed and same material. Produce Drone of same material
-        return material.getEgg();
+        return EggFactory.getEgg(material, material, material);
     }
 
     public void attemptProduceOutput() {

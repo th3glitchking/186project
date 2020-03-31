@@ -43,10 +43,9 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     private PartMaterial core;
     private String user;
 
-    // Don't touch the primary or secondary ColorIn only affects the diamond one
-    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.IRON),new PartMaterial(PartMaterial.IRON),new PartMaterial(PartMaterial.IRON));
-    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD));
-    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND));
+    public DroneSpawnEggItem(PartMaterial blades, PartMaterial shell, PartMaterial core){
+        this(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), blades, shell, core);
+    }
 
     public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, PartMaterial blades, PartMaterial shell, PartMaterial core)
     {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
@@ -59,14 +58,10 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         this.core = core;
         this.user = "";
     }
-
-    public static void registerEggs(){
-        ironDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-        goldDroneSpawnEgg.addInformation(goldDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-        diamondDroneSpawnEgg.addInformation(diamondDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-        Registry.register(Registry.ITEM, "dronez:iron_drone_spawn_egg", ironDroneSpawnEgg);
-        Registry.register(Registry.ITEM, "dronez:gold_drone_spawn_egg", goldDroneSpawnEgg);
-        Registry.register(Registry.ITEM, "dronez:diamond_drone_spawn_egg", diamondDroneSpawnEgg);
+    public DroneSpawnEggItem setMaterials(PartMaterial blades, PartMaterial shell) {
+        this.blades = blades;
+        this.shell = shell;
+        return this;
     }
 
     @Override

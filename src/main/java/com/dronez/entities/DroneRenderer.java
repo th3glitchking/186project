@@ -11,7 +11,9 @@ import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public class DroneRenderer extends MobRenderer<Drone, DroneModel<Drone>> {
-    private static final ResourceLocation SKIN = new ResourceLocation("dronez:textures/iron_drone.png");
+    private static final ResourceLocation IRON = new ResourceLocation("dronez:textures/iron_drone.png");
+    private static final ResourceLocation GOLD = new ResourceLocation("dronez:textures/gold_drone.png");
+    private static final ResourceLocation DIAMOND = new ResourceLocation("dronez:textures/diamond_drone.png");
 
     public DroneRenderer(EntityRendererManager renderManager) {
         //   (renderManager,               model,     shadowSize);
@@ -21,11 +23,20 @@ public class DroneRenderer extends MobRenderer<Drone, DroneModel<Drone>> {
     @Nullable
     @Override
     protected ResourceLocation getEntityTexture(Drone entity) {
-        return SKIN;
+        switch (entity.getShell()){
+            case 1:
+                return IRON;
+            case 2:
+                return GOLD;
+            case 3:
+                return DIAMOND;
+            default:
+                return null;
+        }
     }
 
     @Override
-    protected void preRenderCallback(Drone wabbitEntity, float partialTickTime) {
+    protected void preRenderCallback(Drone entity, float partialTickTime) {
         //Make larger
         GL11.glScalef(2F, 2F, 2F);
     }
