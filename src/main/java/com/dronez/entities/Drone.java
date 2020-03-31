@@ -73,7 +73,6 @@ public class Drone extends FlyingEntity {
 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
-        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
     }
 
