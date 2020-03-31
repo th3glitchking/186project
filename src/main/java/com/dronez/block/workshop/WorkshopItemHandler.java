@@ -1,6 +1,8 @@
 package com.dronez.block.workshop;
 
 import com.dronez.DronezMod;
+import com.dronez.Items.DroneSpawnEggItem;
+import com.dronez.PartMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -8,7 +10,9 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable {
     public static final int TOP_LEFT_BLADE = 500;
@@ -36,10 +40,58 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
      * TODO
      * Called each time an item is inserted /extracted. Determine if
      * the current items on the Workshop are able to build an output.
-     * If so, set the ItemStack in the OUTPUT to the appropriate Drone.
      */
-    private void determineOutput() {
+    @Nullable
+    private DroneSpawnEggItem determineOutput() {
+        PartMaterial material = null;
 
+        for (Map.Entry<Integer, ItemStack> entry : itemStacks.entrySet()) {
+            // If this is the output slot, ignore
+            if (entry.getKey() == OUTPUT) {
+                continue;
+            }
+
+            // Make sure there are no EMPTY stacks
+            if (entry.getValue() == ItemStack.EMPTY) {
+                return null;
+            }
+
+            final ItemStack stack = entry.getValue();
+            PartMaterial mat = PartMaterial.fromItem(stack.getItem());
+            if (mat == null) {
+                // This item isn't part of our mod
+                return null;
+            }
+
+            // Make sure they're all the same material
+            if (material == null) {
+                // First item to be read
+                material = mat;
+            } else {
+                if (!material.equals(mat)) {
+                    // Not of the material as all the others
+                    return null;
+                }
+            }
+        }
+
+        if (material == null) {
+            return null;
+        }
+
+        // All of the items are placed and same material. Produce Drone of same material
+        return material.getEgg();
+    }
+
+    public void attemptProduceOutput() {
+        DroneSpawnEggItem egg = determineOutput();
+        if (egg == null) {
+            itemStacks.put(OUTPUT, ItemStack.EMPTY);
+            return;
+        }
+
+        ItemStack outputStack = new ItemStack(egg, 1);
+        itemStacks.put(OUTPUT, outputStack);
     }
 
     /**
@@ -98,10 +150,8 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
             return stack;
         }
 
-        if (!simulate) {
-            itemStacks.put(slot, stack);
-            determineOutput();
-        }
+        itemStacks.put(slot, stack);
+        attemptProduceOutput();
 
         return ItemStack.EMPTY;
     }
@@ -129,7 +179,14 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
 
         if (!simulate) {
             itemStacks.put(slot, ItemStack.EMPTY);
-            determineOutput();
+            if (slot != OUTPUT) attemptProduceOutput();
+        }
+
+        if (slot == OUTPUT) {
+            // Wipe board clean (except output)
+            itemStacks.entrySet().stream()
+                    .filter(e -> e.getKey() != OUTPUT)
+                    .forEach(e -> itemStacks.put(e.getKey(), ItemStack.EMPTY));
         }
 
         return returnValue;

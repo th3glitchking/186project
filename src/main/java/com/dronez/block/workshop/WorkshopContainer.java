@@ -78,5 +78,6 @@ public class WorkshopContainer extends Container {
         addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.CORE, 48, 35)); // Core
         addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_LEFT_BLADE, 30, 53)); // Bottom left blade
         addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_RIGHT_BLADE, 66, 53)); // Bottom right blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.OUTPUT, 124, 35)); // Output Slot
     }
 }
