@@ -104,6 +104,7 @@ public class DronezMod {
         OBJLoader.INSTANCE.addDomain("dronez");
         RenderingRegistry.registerEntityRenderingHandler(Drone.class, RenderDroneFactory.INSTANCE);
         ScreenManager.registerFactory(WorkshopContainer.TYPE, WorkshopScreen::new);
+        ScreenManager.registerFactory(StorageContainer.TYPE, StorageScreen::new);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {

@@ -25,9 +25,9 @@ public class WorkshopContainer extends Container {
     private InvWrapper inv;
 
     public WorkshopContainer(int id, World world, BlockPos pos, PlayerInventory playerInventory) {
-        super(TYPE, id);
-        this.te = (WorkshopTileEntity)world.getTileEntity(pos);
-        this.inv = new InvWrapper(playerInventory);
+            super(TYPE, id);
+            this.te = (WorkshopTileEntity)world.getTileEntity(pos);
+            this.inv = new InvWrapper(playerInventory);
 
         layoutPlayedInventorySlots(10, 70);
     }

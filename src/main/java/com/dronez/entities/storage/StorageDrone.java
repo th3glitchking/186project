@@ -33,7 +33,7 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
 
     public StorageDrone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
-        this.inv = new Inventory(10);
+        this.inv = new Inventory(27);
     }
 
     @Override
@@ -43,13 +43,13 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new StringTextComponent("Workshop");
+        return new StringTextComponent("Storage Drone");
     }
 
     @Nullable
     @ParametersAreNonnullByDefault
     public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new StorageContainer(i, playerEntity.world, playerInventory);
+        return new StorageContainer(i, playerInventory, inv, 3);
     }
 
     @Override
