@@ -1,9 +1,9 @@
 package com.dronez.block.workshop;
 
 import com.dronez.DronezMod;
-import com.dronez.Items.DroneSpawnEggItem;
-import com.dronez.Items.EggFactory;
 import com.dronez.PartMaterial;
+import com.dronez.items.DroneSpawnEggItem;
+import com.dronez.items.EggFactory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;

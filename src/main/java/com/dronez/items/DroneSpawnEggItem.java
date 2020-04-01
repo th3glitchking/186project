@@ -1,4 +1,4 @@
-package com.dronez.Items;
+package com.dronez.items;
 
 import com.dronez.DronezMod;
 import com.dronez.PartMaterial;
@@ -178,8 +178,7 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return String.format("[DroneSpawnEgg] Core: %s, Shell: %s, Blades: %s, User: %s", core.getMaterial(), shell.getMaterial(), blades.getMaterial(), user);
     }
 }

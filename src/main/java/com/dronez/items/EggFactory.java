@@ -1,16 +1,13 @@
-package com.dronez.Items;
+package com.dronez.items;
 
 import com.dronez.PartMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
-import static com.dronez.DronezMod.MODID;
 import static com.dronez.DronezMod.RegistryEvents.drone;
 import static com.dronez.DronezMod.dronezGroup;
 import static com.dronez.PartMaterial.*;

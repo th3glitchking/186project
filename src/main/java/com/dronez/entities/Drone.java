@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-//For now, this will be the pre-optimization Drone Entity class. Later, this class can easily be modified to support multiple Drone Types via inheritance.
 public class Drone extends FlyingEntity {
 
     // Material type tracking and texture locations
@@ -54,7 +53,7 @@ public class Drone extends FlyingEntity {
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
         this.moveController = new MoveHelperController(this);
-        this.battery = new EnergyStorage(10000, 10000, 10000, 1200);
+        this.battery = new EnergyStorage(10000, 10000, 10000, 10000);
         this.charging = false;
     }
 
@@ -69,7 +68,6 @@ public class Drone extends FlyingEntity {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
     }
-
 
     /**
      * Returns whether the battery is below 1000 FE
@@ -403,12 +401,7 @@ public class Drone extends FlyingEntity {
 
             // If the block disappears, stop charging
             TileEntity te = drone.world.getTileEntity(chargerPos);
-            if (!(te instanceof ChargerBlockTileEntity)) {
-//                DronezUtils.droneSays("Hm, I've lost the charger!");
-                return false;
-            }
-
-            return true;
+            return te instanceof ChargerBlockTileEntity;
         }
 
         /**
@@ -457,7 +450,6 @@ public class Drone extends FlyingEntity {
 
             if (isCloseEnough()) {
                 if (!drone.isCharging()) {
-                    DronezUtils.droneSays("I'm charging!");
                     drone.setCharging(true);
                 }
 
@@ -471,7 +463,7 @@ public class Drone extends FlyingEntity {
 
                 // Get closer to charger
                 drone.getMoveHelper().setMoveTo(targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1D);
-//                DronezUtils.debug(String.format("(%s) -> (%s)", drone.getPos(), targetPos));
+                //DronezUtils.debug(String.format("(%s) -> (%s)", drone.getPos(), targetPos));
             }
         }
     }
