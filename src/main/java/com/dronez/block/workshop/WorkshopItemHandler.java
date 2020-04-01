@@ -11,9 +11,11 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable {
     public static final int TOP_LEFT_BLADE = 500;
@@ -25,9 +27,10 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
     public static final int OUTPUT = 506;
 
     private HashMap<Integer, ItemStack> itemStacks;
+    private ArrayList<Integer> bladeSlotKeys;
 
     public WorkshopItemHandler() {
-        this.itemStacks = new HashMap<>();
+        itemStacks = new HashMap<>();
         itemStacks.put(TOP_LEFT_BLADE, ItemStack.EMPTY);
         itemStacks.put(TOP_RIGHT_BLADE, ItemStack.EMPTY);
         itemStacks.put(BOTTOM_LEFT_BLADE, ItemStack.EMPTY);
@@ -35,64 +38,53 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
         itemStacks.put(SHELL, ItemStack.EMPTY);
         itemStacks.put(CORE, ItemStack.EMPTY);
         itemStacks.put(OUTPUT, ItemStack.EMPTY);
+        bladeSlotKeys = new ArrayList<>(Arrays.asList(TOP_LEFT_BLADE, TOP_RIGHT_BLADE, BOTTOM_LEFT_BLADE, BOTTOM_RIGHT_BLADE));
     }
 
     /**
-     * TODO
-     * Called each time an item is inserted /extracted. Determine if
+     * Called each time an item is inserted/extracted. Determine if
      * the current items on the Workshop are able to build an output.
+     * @return the egg the input is able to craft
      */
-    @Nullable
-    private DroneSpawnEggItem determineOutput() {
-        PartMaterial material = null;
-
-        for (Map.Entry<Integer, ItemStack> entry : itemStacks.entrySet()) {
-            // If this is the output slot, ignore
-            if (entry.getKey() == OUTPUT) {
-                continue;
-            }
-
-            // Make sure there are no EMPTY stacks
-            if (entry.getValue() == ItemStack.EMPTY) {
-                return null;
-            }
-
-            final ItemStack stack = entry.getValue();
-            PartMaterial mat = PartMaterial.fromItem(stack.getItem());
-            if (mat == null) {
-                // This item isn't part of our mod
-                return null;
-            }
-
-            // Make sure they're all the same material
-            if (material == null) {
-                // First item to be read
-                material = mat;
-            } else {
-                if (!material.equals(mat)) {
-                    // Not of the material as all the others
-                    return null;
-                }
-            }
-        }
-
-        if (material == null) {
+    public DroneSpawnEggItem determineOutput() {
+        PartMaterial coreMaterial = PartMaterial.fromItem(itemStacks.get(CORE).getItem());
+        if (coreMaterial == null) {
             return null;
         }
 
-        // All of the items are placed and same material. Produce Drone of same material
-        return EggFactory.getEgg(material, material, material);
-    }
-
-    public void attemptProduceOutput() {
-        DroneSpawnEggItem egg = determineOutput();
-        if (egg == null) {
-            itemStacks.put(OUTPUT, ItemStack.EMPTY);
-            return;
+        PartMaterial shellMaterial = PartMaterial.fromItem(itemStacks.get(SHELL).getItem());
+        if (shellMaterial == null) {
+            return null;
         }
 
-        ItemStack outputStack = new ItemStack(egg, 1);
-        itemStacks.put(OUTPUT, outputStack);
+        // Collect all Blade PartMaterials into a Set
+        Set<PartMaterial> bladeMaterials = bladeSlotKeys.stream()
+                .map(key -> itemStacks.get(key).getItem())
+                .map(PartMaterial::fromItem)
+                .collect(Collectors.toSet());
+
+        // No null and size of 1 means all are present with same PartMaterial
+        if (bladeMaterials.contains(null) || bladeMaterials.size() != 1) {
+            return null;
+        }
+
+        PartMaterial bladeMaterial = bladeMaterials.iterator().next();
+        return EggFactory.getEgg(bladeMaterial, shellMaterial, coreMaterial);
+    }
+
+    /**
+     * Attempt to put an egg into the output
+     */
+    public void attemptProduceOutput() {
+        DroneSpawnEggItem output = determineOutput();
+        if (output == null) {
+            // No output produced
+            itemStacks.put(OUTPUT, ItemStack.EMPTY);
+        } else {
+            // Output produced
+            ItemStack outputStack = new ItemStack(output, 1);
+            itemStacks.put(OUTPUT, outputStack);
+        }
     }
 
     /**
@@ -122,7 +114,7 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
      * </p>
      *
      * @param slot Slot to query
-     * @return ItemStack in given slot. Empty Itemstack if the slot is empty.
+     * @return ItemStack in given slot. Empty ItemStack if the slot is empty.
      **/
     @Nonnull
     @Override
@@ -147,14 +139,18 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
     @Nonnull
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (itemStacks.get(slot) != ItemStack.EMPTY) {
+        ItemStack currentStack = itemStacks.get(slot);
+        if (currentStack != ItemStack.EMPTY) {
             return stack;
         }
 
-        itemStacks.put(slot, stack);
+        ItemStack givenStack = stack.copy();
+        ItemStack deposit = givenStack.split(1);
+
+        itemStacks.put(slot, deposit);
         attemptProduceOutput();
 
-        return ItemStack.EMPTY;
+        return givenStack;
     }
 
     /**
@@ -179,15 +175,13 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
         }
 
         if (!simulate) {
-            itemStacks.put(slot, ItemStack.EMPTY);
-            if (slot != OUTPUT) attemptProduceOutput();
-        }
-
-        if (slot == OUTPUT) {
-            // Wipe board clean (except output)
-            itemStacks.entrySet().stream()
-                    .filter(e -> e.getKey() != OUTPUT)
-                    .forEach(e -> itemStacks.put(e.getKey(), ItemStack.EMPTY));
+            returnValue = itemStacks.get(slot).split(amount);
+            if (slot == OUTPUT) {
+                itemStacks.keySet().stream()
+                        .filter(key -> key != OUTPUT)
+                        .forEach(key -> itemStacks.put(key, ItemStack.EMPTY));
+            }
+            attemptProduceOutput();
         }
 
         return returnValue;

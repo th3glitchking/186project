@@ -1,8 +1,5 @@
 package com.dronez.entities.storage;
 
-import com.dronez.block.workshop.WorkshopBlock;
-import com.dronez.block.workshop.WorkshopTileEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -11,17 +8,10 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class StorageContainer extends Container {
     public static ContainerType<StorageContainer> TYPE = (ContainerType<StorageContainer>) IForgeContainerType.create((windowId, inv, data) -> {

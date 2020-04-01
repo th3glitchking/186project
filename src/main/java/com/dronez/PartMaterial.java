@@ -1,6 +1,5 @@
 package com.dronez;
 
-import com.dronez.Items.DroneSpawnEggItem;
 import net.minecraft.item.Item;
 
 import javax.annotation.Nullable;
@@ -19,6 +18,7 @@ public class PartMaterial {
     public byte getValue() {
         return material;
     }
+
     public String getMaterial() {
         switch (material) {
             case 1:
@@ -30,19 +30,6 @@ public class PartMaterial {
             default:
                 return null;
         }
-    }
-
-    /**
-     * Checks if the materials are equal between this and another PartMaterial
-     * @param o the other PartMaterial
-     * @return whether the materials are equal
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PartMaterial that = (PartMaterial) o;
-        return material == that.material;
     }
 
     @Override

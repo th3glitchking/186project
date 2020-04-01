@@ -12,7 +12,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -21,18 +23,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
+
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static com.dronez.DronezMod.RegistryEvents.drone;
 import static com.dronez.DronezMod.dronezGroup;
@@ -50,8 +51,8 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         this(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), blades, shell, core);
     }
 
-    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, PartMaterial blades, PartMaterial shell, PartMaterial core)
-    {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
+    public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, PartMaterial blades, PartMaterial shell, PartMaterial core) {
+        //May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
         super(typeIn, primaryColorIn, secondaryColorIn, builder);
         //Decode the NBT, first digit is blades, second digit is shell, third digit is core 1 = iron, 2 = gold, 3 = diamond
         //compound = new CompoundNBT();
@@ -65,6 +66,7 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         thisNbt.putByte("Blades", blades.getValue());
         thisNbt.putString("Owner", user);
     }
+
     public DroneSpawnEggItem setMaterials(PartMaterial blades, PartMaterial shell) {
         this.blades = blades;
         this.shell = shell;
@@ -174,10 +176,11 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     public void deserializeNBT(CompoundNBT nbt) {
 
     }
+
     @Override
     public String toString()
     {
-        return "Core: " + core.getMaterial() + " Shell: " + shell.getMaterial() + " Blades: " + blades.getMaterial() + " User: " + user;
+        return String.format("[DroneSpawnEgg] Core: %s, Shell: %s, Blades: %s, User: %s", core.getMaterial(), shell.getMaterial(), blades.getMaterial(), user);
     }
 }
 

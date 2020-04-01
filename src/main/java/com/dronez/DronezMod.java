@@ -1,18 +1,19 @@
 package com.dronez;
 
-import com.dronez.Items.DroneSpawnEggItem;
-import com.dronez.Items.EggFactory;
-import com.dronez.entities.AttackDrone;
 import com.dronez.block.charger.ChargerBlock;
 import com.dronez.block.charger.ChargerBlockTileEntity;
 import com.dronez.block.workshop.WorkshopBlock;
 import com.dronez.block.workshop.WorkshopContainer;
 import com.dronez.block.workshop.WorkshopScreen;
 import com.dronez.block.workshop.WorkshopTileEntity;
-import com.dronez.entities.*;
-import com.dronez.entities.storage.*;
+import com.dronez.entities.AttackDrone;
+import com.dronez.entities.Drone;
+import com.dronez.entities.RenderDroneFactory;
+import com.dronez.entities.storage.StorageContainer;
+import com.dronez.entities.storage.StorageDrone;
+import com.dronez.entities.storage.StorageScreen;
+import com.dronez.items.EggFactory;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -28,7 +29,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -87,8 +87,7 @@ public class DronezMod {
 
     private void setup(final FMLCommonSetupEvent event) {
         // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        LOGGER.info("Dronez: Preinit");
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
@@ -102,7 +101,7 @@ public class DronezMod {
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
         // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("dronez", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
+        //InterModComms.sendTo(MODID, "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
 
     private void processIMC(final InterModProcessEvent event) {
@@ -123,22 +122,13 @@ public class DronezMod {
     // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
-
         public static EntityType<Drone> drone = (EntityType<Drone>) EntityType.Builder.<Drone>create((Drone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:drone");
         public static EntityType<Drone> attack = (EntityType<Drone>) EntityType.Builder.<Drone>create((AttackDrone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:attack_drone");
         public static EntityType<Drone> storage = (EntityType<Drone>) EntityType.Builder.<Drone>create((StorageDrone::new), EntityClassification.CREATURE).build("drone").setRegistryName("dronez:storage_drone");
 
-        private static void generateEntityTypes() {
-            LOGGER.debug("Dronez: Creating EntityTypes...");
-            /*drone = EntityType.Builder
-                    .create(, EntityClassification.CREATURE)
-                    .size(1F, 0.5F)
-                    .build("drone")
-                    .setRegistryName("dronez:drone);*/
-        }
-
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
+            LOGGER.debug("Dronez: Registering Blocks...");
             chargerBlock = (ChargerBlock)ChargerBlock.CHARGER_BLOCK.setRegistryName(MODID, ChargerBlock.REGISTRY_NAME);
             workshopBlock = (WorkshopBlock)WorkshopBlock.WORKSHOP_BLOCK.setRegistryName(MODID, WorkshopBlock.REGISTRY_NAME);
             blockRegistryEvent.getRegistry().registerAll(chargerBlock, workshopBlock);
@@ -146,6 +136,7 @@ public class DronezMod {
 
         @SubscribeEvent
         public static void registerItems(final RegistryEvent.Register<Item> event) {
+            LOGGER.debug("Dronez: Registering Items...");
             ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
             ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
             ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
@@ -159,9 +150,9 @@ public class DronezMod {
             workshopBlockItem = (BlockItem)new BlockItem(workshopBlock, new Item.Properties().group(dronezGroup)).setRegistryName(MODID, "workshop_block_item");
 
             event.getRegistry().registerAll(
-                    ironDroneBlade,ironDroneShell,ironDroneCore,
+                    ironDroneBlade, ironDroneShell, ironDroneCore,
                     goldDroneBlade, goldDroneShell, goldDroneCore,
-                    diamondDroneBlade,diamondDroneCore,diamondDroneShell,
+                    diamondDroneBlade, diamondDroneCore, diamondDroneShell,
                     chargerBlockItem, workshopBlockItem
             );
             EggFactory.registerEggs();
@@ -170,18 +161,18 @@ public class DronezMod {
         @SubscribeEvent
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
             LOGGER.debug("Dronez: Registering Entities...");
-            event.getRegistry().registerAll(
-                    drone, attack, storage
-            );
+            event.getRegistry().registerAll(drone, attack, storage);
         }
 
         @SubscribeEvent
         public static void registerTE(RegistryEvent.Register<TileEntityType<?>> event) {
+            LOGGER.debug("Dronez: Registering Tile Entities...");
             event.getRegistry().registerAll(ChargerBlockTileEntity.TYPE, WorkshopTileEntity.TYPE);
         }
 
         @SubscribeEvent
         public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
+            LOGGER.debug("Dronez: Registering Containers...");
             event.getRegistry().registerAll(WorkshopContainer.TYPE, StorageContainer.TYPE);
         }
     }
@@ -193,9 +184,11 @@ public class DronezMod {
             TileEntity obj = event.getObject();
 
             if (obj instanceof ChargerBlockTileEntity) {
+                LOGGER.debug("Dronez: Registering Charger Capabilities...");
                 ChargerBlockTileEntity entity = (ChargerBlockTileEntity)obj;
                 event.addCapability(ChargerBlock.IDENTIFIER, entity);
             } else if (obj instanceof WorkshopTileEntity) {
+                LOGGER.debug("Dronez: Registering Workshop Capabilities...");
                 WorkshopTileEntity entity = (WorkshopTileEntity)obj;
                 event.addCapability(WorkshopBlock.IDENTIFIER, entity);
             }

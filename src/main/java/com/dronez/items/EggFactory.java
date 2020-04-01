@@ -17,12 +17,11 @@ import static com.dronez.PartMaterial.*;
 
 public class EggFactory {
 
-    private static final DeferredRegister<Item> ITEMS = new DeferredRegister<>(ForgeRegistries.ITEMS, MODID);
     public static final DroneSpawnEggItem ironDroneSpawnEgg = new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), IRON, IRON, IRON);
     public static final DroneSpawnEggItem goldDroneSpawnEgg = new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), GOLD, GOLD, GOLD);
     public static final DroneSpawnEggItem diamondDroneSpawnEgg = new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), DIAMOND, DIAMOND, DIAMOND);
 
-    public static void registerEggs(){
+    public static void registerEggs() {
         ironDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
         goldDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
         diamondDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
@@ -31,6 +30,7 @@ public class EggFactory {
         Registry.register(Registry.ITEM, "dronez:gold_drone_spawn_egg", goldDroneSpawnEgg);
         Registry.register(Registry.ITEM, "dronez:diamond_drone_spawn_egg", diamondDroneSpawnEgg);
     }
+
     /**
      * Get the type of Drone to be made from this material.
      *
@@ -39,7 +39,7 @@ public class EggFactory {
      */
     @Nullable
     public static DroneSpawnEggItem getEgg(PartMaterial blades, PartMaterial shell, PartMaterial core) {
-        switch(core.getValue()){
+        switch (core.getValue()) {
             case 1:
                 return ironDroneSpawnEgg.setMaterials(blades, shell);
             case 2:
