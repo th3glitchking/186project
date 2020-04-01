@@ -76,6 +76,7 @@ public class Drone extends FlyingEntity {
         this.goalSelector.addGoal(10, new ChargingGoal(this));
     }
 
+
     /**
      * Returns whether the battery is below 1000 FE
      * @return we need a charge ASAP
@@ -95,7 +96,7 @@ public class Drone extends FlyingEntity {
     public void tick() {
         super.tick();
 
-        if (!charging) {
+        if (!charging && ticksExisted % 10 == 0) {
             int previousEnergy = battery.getEnergyStored();
             battery.extractEnergy(1, false);
             if (battery.getEnergyStored() == 0 && previousEnergy != 0) {
@@ -140,9 +141,7 @@ public class Drone extends FlyingEntity {
     }
 
     public void readAdditional(CompoundNBT compound) {
-        LOGGER.debug("OONGA BOONGA I WAS ABLE TO GET INTO READ ADDITIONAL HECK YOU SCREEN\n\n\n\n\n\n\n\n REEEEEEE");
         super.readAdditional(compound);
-        LOGGER.debug("Testing in Drone.java readAdditional test: " + compound.getString("Owner"));
         String s;
 
         if (compound.contains("OwnerUUID", 8)) {
@@ -166,15 +165,7 @@ public class Drone extends FlyingEntity {
         super.readAdditional(compound);
     }
 
-    @Override
-    @Nullable
-    public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
-        spawnDataIn = super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
-        if(dataTag != null) this.readAdditional(dataTag);
-        return spawnDataIn;
 
-
-    }
 
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {

@@ -24,6 +24,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 import javax.annotation.Nullable;
@@ -31,6 +32,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.dronez.DronezMod.RegistryEvents.drone;
 import static com.dronez.DronezMod.dronezGroup;
@@ -42,6 +44,7 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     private PartMaterial shell;
     private PartMaterial core;
     private String user;
+    CompoundNBT thisNbt = new CompoundNBT();
 
     public DroneSpawnEggItem(PartMaterial blades, PartMaterial shell, PartMaterial core){
         this(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), blades, shell, core);
@@ -57,18 +60,25 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         this.shell = shell;
         this.core = core;
         this.user = "";
+        thisNbt.putByte("Core", core.getValue());
+        thisNbt.putByte("Shell", shell.getValue());
+        thisNbt.putByte("Blades", blades.getValue());
+        thisNbt.putString("Owner", user);
     }
     public DroneSpawnEggItem setMaterials(PartMaterial blades, PartMaterial shell) {
         this.blades = blades;
         this.shell = shell;
+
+        thisNbt.putByte("Shell", shell.getValue());
+        thisNbt.putByte("Blades", blades.getValue());
         return this;
     }
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         tooltip.add(new StringTextComponent("Blades: " + blades.getMaterial()));
-        tooltip.add(new StringTextComponent("Blade shell: " + shell.getMaterial()));
-        tooltip.add(new StringTextComponent("Blade core: " + core.getMaterial()));
+        tooltip.add(new StringTextComponent("Shell: " + shell.getMaterial()));
+        tooltip.add(new StringTextComponent("Core: " + core.getMaterial()));
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
@@ -79,15 +89,11 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
 
         ItemStack itemstack = playerIn.getHeldItem(handIn);
         user = playerIn.getName().getString();
-        //DronezMod.LOGGER.debug("Testing in the onItemRightClock: " + playerIn.getName().getString());
 
-        CompoundNBT thisNbt;
-        thisNbt = serializeNBT();
-        DronezMod.LOGGER.debug("First test: " + thisNbt.getString("Owner"));
+        thisNbt.putString("Owner", playerIn.getName().getString());
+        //DronezMod.LOGGER.debug("Testing in the onItemRightClock: " + playerIn.getName().getString());
         itemstack.write(thisNbt);
-        DronezMod.LOGGER.debug("Second test: " + thisNbt.getString("Owner"));
         itemstack.deserializeNBT(thisNbt);
-        DronezMod.LOGGER.debug("Third test: " + thisNbt.getString("Owner"));
         if (worldIn.isRemote) {
             return new ActionResult<>(ActionResultType.PASS, itemstack);
         } else {
@@ -101,7 +107,7 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
                     return new ActionResult<>(ActionResultType.PASS, itemstack);
                 } else if (worldIn.isBlockModifiable(playerIn, blockpos) && playerIn.canPlayerEdit(blockpos, blockraytraceresult.getFace(), itemstack)) {
                     EntityType<?> entitytype = this.getType(itemstack.getTag());
-                    if (entitytype.spawn(worldIn, itemstack, playerIn, blockpos, SpawnReason.SPAWN_EGG, false, false) == null) {
+                    if (entitytype.spawn(worldIn, thisNbt, null, playerIn, blockpos, SpawnReason.SPAWN_EGG, false, false) == null) {
                         return new ActionResult<>(ActionResultType.PASS, itemstack);
                     } else {
                         if (!playerIn.abilities.isCreativeMode) {
@@ -150,7 +156,6 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
         nbt.putByte("Shell", shell.getValue());
         nbt.putByte("Blades", blades.getValue());
         nbt.putString("Owner", user);
-        DronezMod.LOGGER.debug("SerializeNBT test: " + nbt.getString("Owner"));
         return nbt;
     }
 
