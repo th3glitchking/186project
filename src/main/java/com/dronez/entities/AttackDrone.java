@@ -29,17 +29,12 @@ public class AttackDrone extends Drone {
 
     @Override
     protected void registerGoals() {
-<<<<<<< HEAD
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
         this.goalSelector.addGoal(3, new AttackDrone.DefendTargetGoal(this));
         this.goalSelector.addGoal(3, new AttackDrone.TargetHurtByOwnerGoal(this));
 
-=======
-        super.registerGoals();
-        this.goalSelector.addGoal(3, new AttackDrone.OwnerHurtByTargetGoal(this));
->>>>>>> 291e790362e129701d5df31f936abf77c6bc5110
     }
 
     public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner) {

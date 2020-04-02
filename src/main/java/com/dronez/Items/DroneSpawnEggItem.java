@@ -44,9 +44,9 @@ public class DroneSpawnEggItem extends SpawnEggItem implements INBTSerializable<
     private String user;
 
     // Don't touch the primary or secondary ColorIn only affects the diamond one
-    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.IRON),new PartMaterial(PartMaterial.IRON),new PartMaterial(PartMaterial.IRON));
-    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD));
-    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND));
+    public static final DroneSpawnEggItem ironDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup).maxStackSize(1)), new PartMaterial(PartMaterial.IRON),new PartMaterial(PartMaterial.IRON),new PartMaterial(PartMaterial.IRON));
+    public static final DroneSpawnEggItem goldDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup).maxStackSize(1)), new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD),new PartMaterial(PartMaterial.GOLD));
+    public static final DroneSpawnEggItem diamondDroneSpawnEgg = (DroneSpawnEggItem) new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup).maxStackSize(1)), new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND),new PartMaterial(PartMaterial.DIAMOND));
 
     public DroneSpawnEggItem(EntityType<Drone> typeIn, int primaryColorIn, int secondaryColorIn, Item.Properties builder, PartMaterial blades, PartMaterial shell, PartMaterial core)
     {//May want to change the input of the types to a list to be cleaner, then add constants for the indexes of each item like BLADE1_POSITION = 0;
