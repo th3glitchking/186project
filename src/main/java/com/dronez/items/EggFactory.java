@@ -36,15 +36,20 @@ public class EggFactory {
      */
     @Nullable
     public static DroneSpawnEggItem getEgg(PartMaterial blades, PartMaterial shell, PartMaterial core) {
+        DroneSpawnEggItem newEgg = null;
         switch (core.getValue()) {
             case 1:
-                return ironDroneSpawnEgg.setMaterials(blades, shell);
+                newEgg = ironDroneSpawnEgg;
+                break;
             case 2:
-                return goldDroneSpawnEgg.setMaterials(blades, shell);
+                newEgg = goldDroneSpawnEgg;
+                break;
             case 3:
-                return diamondDroneSpawnEgg.setMaterials(blades, shell);
+                newEgg = diamondDroneSpawnEgg;
+                break;
             default:
                 return null;
         }
+        return newEgg.setMaterials(blades, shell);
     }
 }
