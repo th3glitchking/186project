@@ -11,13 +11,11 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable {
+public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerModifiable {
     public static final int TOP_LEFT_BLADE = 500;
     public static final int TOP_RIGHT_BLADE = 501;
     public static final int BOTTOM_LEFT_BLADE = 502;
@@ -29,7 +27,7 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
     private HashMap<Integer, ItemStack> itemStacks;
     private ArrayList<Integer> bladeSlotKeys;
 
-    public WorkshopItemHandler() {
+    public WorkshopAssembleItemHandler() {
         itemStacks = new HashMap<>();
         itemStacks.put(TOP_LEFT_BLADE, ItemStack.EMPTY);
         itemStacks.put(TOP_RIGHT_BLADE, ItemStack.EMPTY);
@@ -85,6 +83,14 @@ public class WorkshopItemHandler implements IItemHandler, IItemHandlerModifiable
             ItemStack outputStack = new ItemStack(output, 1);
             itemStacks.put(OUTPUT, outputStack);
         }
+    }
+
+    /**
+     * Return all of the ItemStacks that have input items in them
+     * @return ItemStacks that hold blades, shells, and cores
+     */
+    public Stream<ItemStack> getInputStacks() {
+        return itemStacks.entrySet().stream().filter(entry -> entry.getKey() != OUTPUT).map(Map.Entry::getValue);
     }
 
     /**

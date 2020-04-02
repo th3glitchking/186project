@@ -26,13 +26,13 @@ public class WorkshopContainer extends Container {
 
     private WorkshopTileEntity te;
     private InvWrapper inv;
-    private WorkshopItemHandler itemInv;
+    private WorkshopAssembleItemHandler assembleItemInv;
 
     public WorkshopContainer(int id, World world, BlockPos pos, PlayerInventory playerInventory) {
         super(TYPE, id);
-        this.te = (WorkshopTileEntity)world.getTileEntity(pos);
-        this.inv = new InvWrapper(playerInventory);
-        this.itemInv = new WorkshopItemHandler();
+        te = (WorkshopTileEntity)world.getTileEntity(pos);
+        inv = new InvWrapper(playerInventory);
+        assembleItemInv = new WorkshopAssembleItemHandler();
 
         layoutPlayerInventorySlots();
         layoutWorkshopInventorySlots();
@@ -73,14 +73,17 @@ public class WorkshopContainer extends Container {
         addSlotRange(inv, 0, leftCol, topRow);
     }
 
+    /**
+     * Add all the slots for Workshop
+     */
     private void layoutWorkshopInventorySlots() {
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.TOP_LEFT_BLADE, 30, 17)); // Top left blade
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.SHELL, 48, 17)); // Shell
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.TOP_RIGHT_BLADE, 66, 17)); // Top right blade
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.CORE, 48, 35)); // Core
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_LEFT_BLADE, 30, 53)); // Bottom left blade
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_RIGHT_BLADE, 66, 53)); // Bottom right blade
-        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.OUTPUT, 124, 35)); // Output Slot
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.TOP_LEFT_BLADE, 30, 17)); // Top left blade
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.SHELL, 48, 17)); // Shell
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.TOP_RIGHT_BLADE, 66, 17)); // Top right blade
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.CORE, 48, 35)); // Core
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.BOTTOM_LEFT_BLADE, 30, 53)); // Bottom left blade
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.BOTTOM_RIGHT_BLADE, 66, 53)); // Bottom right blade
+        addSlot(new SlotItemHandler(assembleItemInv, WorkshopAssembleItemHandler.OUTPUT, 124, 35)); // Output Slot
     }
 
     /**
@@ -110,5 +113,17 @@ public class WorkshopContainer extends Container {
         }
 
         return itemstack;
+    }
+
+    @Override
+    public void onContainerClosed(PlayerEntity playerIn) {
+        super.onContainerClosed(playerIn);
+
+        // Throw out any unused input items in Workshop
+        assembleItemInv.getInputStacks().forEach(stack -> {
+            if (!stack.isEmpty()) {
+                playerIn.dropItem(stack, false);
+            }
+        });
     }
 }
