@@ -14,7 +14,6 @@ import static com.dronez.PartMaterial.*;
 
 public class EggFactory {
 
-    public static final DroneSpawnEggItem ironDroneSpawnEgg = new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), IRON, IRON, IRON);
     public static final DroneSpawnEggItem goldDroneSpawnEgg = new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), GOLD, GOLD, GOLD);
     public static final DroneSpawnEggItem diamondDroneSpawnEgg = new DroneSpawnEggItem(drone, 0xFFFFFF, 0xFFFFFF, (new Item.Properties().group(dronezGroup)), DIAMOND, DIAMOND, DIAMOND);
 
