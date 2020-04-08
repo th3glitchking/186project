@@ -9,8 +9,11 @@ import net.minecraft.entity.ai.goal.TargetGoal;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.horse.AbstractHorseEntity;
+import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+import net.minecraft.entity.ai.goal.OwnerHurtByTargetGoal;
+import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
 
 import java.util.EnumSet;
 
@@ -25,8 +28,8 @@ public class AttackDrone extends Drone {
     protected void registerGoals() {
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
         super.registerGoals();
-        this.goalSelector.addGoal(3, new AttackDrone.DefendTargetGoal(this));
-        this.goalSelector.addGoal(3, new AttackDrone.TargetHurtByOwnerGoal(this));
+        this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
 
     }
 
@@ -48,87 +51,9 @@ public class AttackDrone extends Drone {
         }
     }
 
-    static class DefendTargetGoal extends NearestAttackableTargetGoal<WolfEntity> {
-        public DefendTargetGoal(AttackDrone drone) {
-            super(drone, WolfEntity.class, 16, false, true, (p_220789_0_) -> {
-                return !((WolfEntity)p_220789_0_).isTamed();//may not be the best thing in the world
-            });
-        }
-
-        protected double getTargetDistance() {
-            return super.getTargetDistance() * 0.25D;
-        }
-    }
-
-    /*public class OwnerHurtByTargetGoal extends TargetGoal {
-        private final AttackDrone drone;
-        private LivingEntity attacker;
-        private int timestamp;
-
-        public OwnerHurtByTargetGoal(AttackDrone theDefendingDroneIn) {
-            super(theDefendingDroneIn, false);
-            this.drone = theDefendingDroneIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.TARGET));
-        }
 
 
-         //Returns whether the EntityAIBase should begin execution.
-
-        public boolean shouldExecute() {
-            if (!this.drone.isCharging()) {
-                LivingEntity livingentity = this.drone.getOwner();
-                if (livingentity == null) {
-                    return false;
-                } else {
-                    this.attacker = livingentity.getRevengeTarget();
-                    int i = livingentity.getRevengeTimer();
-                    return i != this.timestamp && this.isSuitableTarget(this.attacker, EntityPredicate.DEFAULT) && this.drone.shouldAttackEntity(this.attacker, livingentity);
-                }
-            } else {
-                return false;
-            }
-        }
 
 
-         // Execute a one shot task or start executing a continuous task
 
-        public void startExecuting() {
-            this.goalOwner.setAttackTarget(this.attacker);
-            LivingEntity livingentity = this.drone.getOwner();
-            if (livingentity != null) {
-                this.timestamp = livingentity.getRevengeTimer();
-            }
-
-            super.startExecuting();
-        }
-
-    }*/
-    public class TargetHurtByOwnerGoal extends TargetGoal{
-        private final AttackDrone drone;
-        private LivingEntity attacker;
-        private int timestamp;
-
-
-        public TargetHurtByOwnerGoal(AttackDrone theAttackingDroneIn) {
-            super(theAttackingDroneIn, false);
-            this.drone = theAttackingDroneIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.TARGET));
-        }
-
-        @Override
-        public boolean shouldExecute() {
-            if (!this.drone.isCharging()) {
-                LivingEntity livingentity = this.drone.getOwner();
-                if (livingentity == null) {
-                    return false;
-                } else {//Not sure about what is in the else
-                    this.attacker = livingentity.getRevengeTarget();
-                    int i = livingentity.getRevengeTimer();
-                    return i != this.timestamp && this.isSuitableTarget(this.attacker, EntityPredicate.DEFAULT) && this.drone.shouldAttackEntity(this.attacker, livingentity);
-                }
-            } else {
-                return false;
-            }
-        }
-    }
 }

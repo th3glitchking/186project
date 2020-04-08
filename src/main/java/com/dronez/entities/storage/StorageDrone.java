@@ -114,7 +114,7 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
     }
 
     @Override
-    protected boolean processInteract(PlayerEntity player, Hand hand) {
+    public boolean processInteract(PlayerEntity player, Hand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         Item item = itemstack.getItem();
         if(itemstack.isEmpty() || item.isFood()){
