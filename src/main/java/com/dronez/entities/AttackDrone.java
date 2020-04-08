@@ -3,18 +3,12 @@ package com.dronez.entities;
 import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.LookRandomlyGoal;
 import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.ai.goal.TargetGoal;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.horse.AbstractHorseEntity;
-import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
@@ -30,8 +24,7 @@ public class AttackDrone extends Drone {
     @Override
     protected void registerGoals() {
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
-        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
-        //this.goalSelector.addGoal(3, new Drone.Charge(this.battery));
+        super.registerGoals();
         this.goalSelector.addGoal(3, new AttackDrone.DefendTargetGoal(this));
         this.goalSelector.addGoal(3, new AttackDrone.TargetHurtByOwnerGoal(this));
 

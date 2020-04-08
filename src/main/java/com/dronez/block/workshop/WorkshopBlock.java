@@ -1,5 +1,6 @@
 package com.dronez.block.workshop;
 
+import com.dronez.DronezMod;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
@@ -21,6 +23,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 public class WorkshopBlock extends ContainerBlock {
     public static final WorkshopBlock WORKSHOP_BLOCK = new WorkshopBlock();
+    public static final String REGISTRY_NAME = "workshop_block";
+    public static ResourceLocation IDENTIFIER = new ResourceLocation(DronezMod.MODID, REGISTRY_NAME);
 
     public WorkshopBlock() {
         super(Block.Properties.create(Material.GLASS));

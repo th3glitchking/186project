@@ -1,10 +1,13 @@
 package com.dronez.block.workshop;
 
+import com.dronez.DronezMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -19,17 +22,20 @@ public class WorkshopContainer extends Container {
     public static ContainerType<WorkshopContainer> TYPE = (ContainerType<WorkshopContainer>) IForgeContainerType.create((windowId, inv, data) -> {
         BlockPos pos = data.readBlockPos();
         return new WorkshopContainer(windowId, Minecraft.getInstance().world, pos, inv);
-    }).setRegistryName("dronez", "workshop_block");
+    }).setRegistryName(DronezMod.MODID, WorkshopBlock.REGISTRY_NAME);
 
     private WorkshopTileEntity te;
     private InvWrapper inv;
+    private WorkshopItemHandler itemInv;
 
     public WorkshopContainer(int id, World world, BlockPos pos, PlayerInventory playerInventory) {
         super(TYPE, id);
         this.te = (WorkshopTileEntity)world.getTileEntity(pos);
         this.inv = new InvWrapper(playerInventory);
+        this.itemInv = new WorkshopItemHandler();
 
-        layoutPlayedInventorySlots(10, 70);
+        layoutPlayerInventorySlots();
+        layoutWorkshopInventorySlots();
     }
 
     @Override
@@ -38,34 +44,71 @@ public class WorkshopContainer extends Container {
         return isWithinUsableDistance(IWorldPosCallable.of(te.getWorld(), te.getPos()), playerIn, WorkshopBlock.WORKSHOP_BLOCK);
     }
 
-    private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
-        for (int i = 0; i < amount; i++) {
+    private int addSlotRange(IItemHandler handler, int index, int x, int y) {
+        for (int i = 0; i < 9; i++) {
             addSlot(new SlotItemHandler(handler, index, x, y));
-            x += dx;
+            x += 18;
             index++;
         }
 
         return index;
     }
 
-    private int addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
-        for (int j = 0; j < verAmount; j++) {
-            index = addSlotRange(handler, index, x, y, horAmount, dx);
-            y += dy;
+    private void addSlotBox(IItemHandler handler, int x, int y) {
+        int index = 9;
+        for (int j = 0; j < 3; j++) {
+            index = addSlotRange(handler, index, x, y);
+            y += 18;
         }
-
-        return index;
     }
 
-    private void layoutPlayedInventorySlots(int leftCol, int topRow) {
+    private void layoutPlayerInventorySlots() {
+        int leftCol = 8, topRow = 84;
+
         // Player inventory
-        int index = addSlotBox(inv, 9, leftCol, topRow, 9, 18, 3, 18);
+        addSlotBox(inv, leftCol, topRow);
 
-        // Hotbar
+        // Player hotbar
         topRow += 58;
-        addSlotRange(inv, 0, leftCol, topRow, 9, 18);
+        addSlotRange(inv, 0, leftCol, topRow);
+    }
 
-        // Workshop slots
-        addSlot(new SlotItemHandler(inv, index, 64, 24));
+    private void layoutWorkshopInventorySlots() {
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.TOP_LEFT_BLADE, 30, 17)); // Top left blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.SHELL, 48, 17)); // Shell
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.TOP_RIGHT_BLADE, 66, 17)); // Top right blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.CORE, 48, 35)); // Core
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_LEFT_BLADE, 30, 53)); // Bottom left blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.BOTTOM_RIGHT_BLADE, 66, 53)); // Bottom right blade
+        addSlot(new SlotItemHandler(itemInv, WorkshopItemHandler.OUTPUT, 124, 35)); // Output Slot
+    }
+
+    /**
+     * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player
+     * inventory and the other inventory(s).
+     */
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+        int numRows = 4;
+        if (slot != null && slot.getHasStack()) {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+            if (index < numRows * 9) {
+                if (!this.mergeItemStack(itemstack1, numRows * 9, this.inventorySlots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.mergeItemStack(itemstack1, 0, numRows * 9, false)) {
+                return ItemStack.EMPTY;
+            }
+
+            if (itemstack1.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
+            } else {
+                slot.onSlotChanged();
+            }
+        }
+
+        return itemstack;
     }
 }
