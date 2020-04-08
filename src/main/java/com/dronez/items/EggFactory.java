@@ -20,8 +20,8 @@ public class EggFactory {
 
     public static void registerEggs() {
         ironDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-        goldDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
-        diamondDroneSpawnEgg.addInformation(ironDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+        goldDroneSpawnEgg.addInformation(goldDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
+        diamondDroneSpawnEgg.addInformation(diamondDroneSpawnEgg.getDefaultInstance(), null, new ArrayList<ITextComponent>(), null);
 
         Registry.register(Registry.ITEM, "dronez:iron_drone_spawn_egg", ironDroneSpawnEgg);
         Registry.register(Registry.ITEM, "dronez:gold_drone_spawn_egg", goldDroneSpawnEgg);
@@ -36,15 +36,20 @@ public class EggFactory {
      */
     @Nullable
     public static DroneSpawnEggItem getEgg(PartMaterial blades, PartMaterial shell, PartMaterial core) {
+        DroneSpawnEggItem newEgg;
         switch (core.getValue()) {
             case 1:
-                return ironDroneSpawnEgg.setMaterials(blades, shell);
+                newEgg = ironDroneSpawnEgg;
+                break;
             case 2:
-                return goldDroneSpawnEgg.setMaterials(blades, shell);
+                newEgg = goldDroneSpawnEgg;
+                break;
             case 3:
-                return diamondDroneSpawnEgg.setMaterials(blades, shell);
+                newEgg = diamondDroneSpawnEgg;
+                break;
             default:
                 return null;
         }
+        return newEgg.setMaterials(blades, shell);
     }
 }
