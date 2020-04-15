@@ -9,7 +9,7 @@ public class PartMaterial {
 
     public static final PartMaterial IRON = new PartMaterial((byte) 1), GOLD = new PartMaterial((byte) 2), DIAMOND = new PartMaterial((byte) 3);
 
-    private byte material;
+    private final byte material;
 
     public PartMaterial(byte material){
         this.material = material;

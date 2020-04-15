@@ -11,8 +11,8 @@ import net.minecraft.util.text.ITextComponent;
 import javax.annotation.Nonnull;
 
 public class WorkshopScreen extends ContainerScreen<WorkshopContainer> {
-    private ResourceLocation ASSEMBLE_GUI = new ResourceLocation(DronezMod.MODID, "textures/gui/workshop_assemble.png");
-    private ResourceLocation AI_GUI = new ResourceLocation(DronezMod.MODID, "textures/gui/workshop_ai.png");
+    private final ResourceLocation ASSEMBLE_GUI = new ResourceLocation(DronezMod.MODID, "textures/gui/workshop_assemble.png");
+    private final ResourceLocation AI_GUI = new ResourceLocation(DronezMod.MODID, "textures/gui/workshop_ai.png");
     private WorkshopDisplayType displayType;
     private Button switchViewButton;
 
@@ -34,7 +34,7 @@ public class WorkshopScreen extends ContainerScreen<WorkshopContainer> {
 
     /**
      * Returns the name of the opposite display type
-     * @return
+     * @return the title of the button for a certain display type
      */
     @Nonnull
     private String getButtonTitle() {

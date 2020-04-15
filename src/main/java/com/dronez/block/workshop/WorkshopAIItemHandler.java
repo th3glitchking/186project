@@ -1,6 +1,7 @@
 package com.dronez.block.workshop;
 
 import com.dronez.DronezMod;
+import com.dronez.items.DronezCore;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -8,8 +9,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,8 +24,8 @@ public class WorkshopAIItemHandler implements IItemHandler, IItemHandlerModifiab
     public static final int MODIFIER = 508;
     public static final int OUTPUT = 509;
 
-    private HashMap<Integer, ItemStack> itemStacks;
-    private ArrayList<Item> swords;
+    private final HashMap<Integer, ItemStack> itemStacks;
+    private final ArrayList<Item> swords;
 
     public WorkshopAIItemHandler() {
         itemStacks = new HashMap<>();
@@ -41,24 +44,41 @@ public class WorkshopAIItemHandler implements IItemHandler, IItemHandlerModifiab
     /**
      * Called each time an item is inserted/extracted. Determine if
      * the current items on the Workshop are able to build an output.
-     * @return the core the input is able to craft
+     * @return the type of core this core is transforming into
      */
-    public Item determineOutput() {
-        return null;
+    @Nullable
+    public String determineOutputType() {
+        if (itemStacks.get(CORE).getItem() == Items.AIR) {
+            // We don't do anything if there isn't an input core preset
+            return null;
+        }
+
+        if (itemStacks.get(MODIFIER).getItem() == Items.CHEST) {
+            // If chest, set core to storage
+            return DronezCore.CORE_TYPE_STORAGE;
+        } else if (itemStacks.get(MODIFIER).getItem() == Items.AIR) {
+            // If no modifier, reset core to follow
+            return DronezCore.CORE_TYPE_FOLLOW;
+        } else {
+            // If it's not empty and not a chest, it must be a sword
+            return DronezCore.CORE_TYPE_ATTACK;
+        }
     }
 
     /**
      * Attempt to put a Core into the output
      */
     public void attemptProduceOutput() {
-        Item output = determineOutput();
+        String output = determineOutputType();
         if (output == null) {
             // No output produced
             itemStacks.put(OUTPUT, ItemStack.EMPTY);
         } else {
             // Output produced
-            ItemStack outputStack = new ItemStack(output, 1);
+            ItemStack outputStack = new ItemStack(itemStacks.get(CORE).getItem(), 1);
+            DronezCore.setType(outputStack, output);
             itemStacks.put(OUTPUT, outputStack);
+            LogManager.getLogger().debug("Output Core Type: {}", DronezCore.getType(outputStack));
         }
     }
 

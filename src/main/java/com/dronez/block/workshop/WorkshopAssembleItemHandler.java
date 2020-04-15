@@ -3,6 +3,7 @@ package com.dronez.block.workshop;
 import com.dronez.DronezMod;
 import com.dronez.PartMaterial;
 import com.dronez.items.DroneSpawnEggItem;
+import com.dronez.items.DronezCore;
 import com.dronez.items.EggFactory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -24,8 +25,8 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
     public static final int CORE = 505;
     public static final int OUTPUT = 506;
 
-    private HashMap<Integer, ItemStack> itemStacks;
-    private ArrayList<Integer> bladeSlotKeys;
+    private final HashMap<Integer, ItemStack> itemStacks;
+    private final ArrayList<Integer> bladeSlotKeys;
 
     public WorkshopAssembleItemHandler() {
         itemStacks = new HashMap<>();
@@ -65,6 +66,9 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
         if (bladeMaterials.contains(null) || bladeMaterials.size() != 1) {
             return null;
         }
+
+        // TODO - implement AI Core type
+        // String coreType = DronezCore.getType(itemStacks.get(CORE));
 
         PartMaterial bladeMaterial = bladeMaterials.iterator().next();
         return EggFactory.getEgg(bladeMaterial, shellMaterial, coreMaterial);
@@ -154,6 +158,10 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
         ItemStack deposit = givenStack.split(1);
 
         itemStacks.put(slot, deposit);
+
+        // Fire Dronez items' NBT building
+        DronezCore.attemptInit(deposit);
+
         attemptProduceOutput();
 
         return givenStack;
@@ -230,7 +238,7 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
         } else if (slot == SHELL) {
             return stack.getItem() == DronezMod.ironDroneShell || stack.getItem() == DronezMod.goldDroneShell || stack.getItem() == DronezMod.diamondDroneShell;
         } else if (slot == CORE) {
-            return stack.getItem() == DronezMod.ironDroneCore || stack.getItem() == DronezMod.goldDroneCore || stack.getItem() == DronezMod.diamondDroneCore;
+            return DronezCore.is(stack);
         }
 
         return false;
