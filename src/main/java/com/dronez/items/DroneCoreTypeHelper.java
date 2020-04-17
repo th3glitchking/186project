@@ -1,6 +1,7 @@
 package com.dronez.items;
 
 import com.dronez.DronezMod;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 
@@ -11,15 +12,15 @@ import java.util.List;
 /**
  * Class adding convenience methods for Drone Core items.
  */
-public class DronezCore {
+public class DroneCoreTypeHelper {
     public static final String CORE_TYPE_FOLLOW = "Follow";
     public static final String CORE_TYPE_ATTACK = "Attack";
     public static final String CORE_TYPE_STORAGE = "Storage";
-    private static final String CORE_TYPE_TAG = "DronezCoreType";
+    private static final String CORE_TYPE_TAG = "Type";
     private static final List<String> TYPES = Arrays.asList(CORE_TYPE_FOLLOW, CORE_TYPE_ATTACK, CORE_TYPE_STORAGE);
 
     /**
-     * If this stack does not have an existing type, set it to {@link DronezCore#CORE_TYPE_FOLLOW}.
+     * If this stack does not have an existing type, set it to {@link DroneCoreTypeHelper#CORE_TYPE_FOLLOW}.
      * This is used every time interaction occurs with a Core to make
      * sure it has a type at the proper time.
      * @param stack the input stack
@@ -31,7 +32,7 @@ public class DronezCore {
         }
 
         CompoundNBT tag = stack.getTag();
-        if (tag == null || tag.getString(CORE_TYPE_TAG).isEmpty()) {
+        if (tag == null || !tag.contains(CORE_TYPE_TAG)) {
             // If there's no value for the type, set it to follow
             setType(stack, CORE_TYPE_FOLLOW);
         }
@@ -60,16 +61,12 @@ public class DronezCore {
         assertValidItemStack(stack);
 
         CompoundNBT tag = stack.getTag();
-        if (tag == null) {
+        if (tag == null || !tag.contains(CORE_TYPE_TAG)) {
             // The stack has no tag
             return null;
         }
 
         String coreType = tag.getString(CORE_TYPE_TAG);
-        if (coreType.isEmpty()) {
-            // The stack's tag doesn't contain a type
-            return null;
-        }
 
         assertValidCoreType(coreType);
         return coreType;
@@ -84,6 +81,18 @@ public class DronezCore {
         return stack.getItem() == DronezMod.ironDroneCore ||
                 stack.getItem() == DronezMod.goldDroneCore ||
                 stack.getItem() == DronezMod.diamondDroneCore;
+    }
+
+    public static EntityType<?> from(String type) {
+        assertValidCoreType(type);
+        if (type.equals(CORE_TYPE_FOLLOW)) {
+            return DronezMod.RegistryEvents.drone;
+        } else if (type.equals(CORE_TYPE_ATTACK)) {
+            return DronezMod.RegistryEvents.attack;
+        } else if (type.equals(CORE_TYPE_STORAGE)) {
+            return DronezMod.RegistryEvents.storage;
+        }
+        throw new IllegalArgumentException("Invalid DronezCore type");
     }
 
     /**

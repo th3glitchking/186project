@@ -2,10 +2,13 @@ package com.dronez.block.workshop;
 
 import com.dronez.DronezMod;
 import com.dronez.PartMaterial;
-import com.dronez.items.DroneSpawnEggItem;
-import com.dronez.items.DronezCore;
-import com.dronez.items.EggFactory;
+import com.dronez.items.DroneCoreTypeHelper;
+import com.dronez.items.DronePackageItem;
+import com.dronez.items.PackageFactory;
+import com.sun.javafx.collections.ObservableMapWrapper;
+import javafx.collections.MapChangeListener;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -25,11 +28,11 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
     public static final int CORE = 505;
     public static final int OUTPUT = 506;
 
-    private final HashMap<Integer, ItemStack> itemStacks;
+    private final ObservableMapWrapper<Integer, ItemStack> itemStacks;
     private final ArrayList<Integer> bladeSlotKeys;
 
     public WorkshopAssembleItemHandler() {
-        itemStacks = new HashMap<>();
+        itemStacks = new ObservableMapWrapper<>(new HashMap<>());
         itemStacks.put(TOP_LEFT_BLADE, ItemStack.EMPTY);
         itemStacks.put(TOP_RIGHT_BLADE, ItemStack.EMPTY);
         itemStacks.put(BOTTOM_LEFT_BLADE, ItemStack.EMPTY);
@@ -38,6 +41,17 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
         itemStacks.put(CORE, ItemStack.EMPTY);
         itemStacks.put(OUTPUT, ItemStack.EMPTY);
         bladeSlotKeys = new ArrayList<>(Arrays.asList(TOP_LEFT_BLADE, TOP_RIGHT_BLADE, BOTTOM_LEFT_BLADE, BOTTOM_RIGHT_BLADE));
+
+        itemStacks.addListener((MapChangeListener<Integer, ItemStack>) change -> {
+            if (change.getKey().intValue() != CORE || !DroneCoreTypeHelper.is(change.getValueAdded())) {
+                return;
+            }
+
+            CompoundNBT coreTags = change.getValueAdded().getTag();
+            if (coreTags == null) {
+                DroneCoreTypeHelper.attemptInit(itemStacks.get(change.getKey()));
+            }
+        });
     }
 
     /**
@@ -45,47 +59,44 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
      * the current items on the Workshop are able to build an output.
      * @return the egg the input is able to craft
      */
-    public DroneSpawnEggItem determineOutput() {
-        PartMaterial coreMaterial = PartMaterial.fromItem(itemStacks.get(CORE).getItem());
-        if (coreMaterial == null) {
-            return null;
-        }
-
-        PartMaterial shellMaterial = PartMaterial.fromItem(itemStacks.get(SHELL).getItem());
-        if (shellMaterial == null) {
+    public ItemStack determineOutput() {
+        byte shellMaterial = PartMaterial.fromItem(itemStacks.get(SHELL).getItem());
+        if (shellMaterial == -1) {
             return null;
         }
 
         // Collect all Blade PartMaterials into a Set
-        Set<PartMaterial> bladeMaterials = bladeSlotKeys.stream()
+        Set<Byte> bladeMaterials = bladeSlotKeys.stream()
                 .map(key -> itemStacks.get(key).getItem())
                 .map(PartMaterial::fromItem)
                 .collect(Collectors.toSet());
 
         // No null and size of 1 means all are present with same PartMaterial
-        if (bladeMaterials.contains(null) || bladeMaterials.size() != 1) {
+        if (bladeMaterials.contains((byte)-1) || bladeMaterials.size() != 1) {
             return null;
         }
+        byte bladeMaterial = bladeMaterials.iterator().next();
 
-        // TODO - implement AI Core type
-        // String coreType = DronezCore.getType(itemStacks.get(CORE));
+        ItemStack outputStack = new ItemStack(DronezMod.dronePackageItem, 1);
 
-        PartMaterial bladeMaterial = bladeMaterials.iterator().next();
-        return EggFactory.getEgg(bladeMaterial, shellMaterial, coreMaterial);
+        CompoundNBT outputTags = PackageFactory.Builder().blades(bladeMaterial).shell(shellMaterial).core(itemStacks.get(CORE)).build();
+
+        outputStack.getOrCreateTag().put(DronePackageItem.DRONE_PACKAGE_TAG_KEY, outputTags);
+
+        return outputStack;
     }
 
     /**
      * Attempt to put an egg into the output
      */
     public void attemptProduceOutput() {
-        DroneSpawnEggItem output = determineOutput();
+        ItemStack output = determineOutput();
         if (output == null) {
             // No output produced
             itemStacks.put(OUTPUT, ItemStack.EMPTY);
         } else {
             // Output produced
-            ItemStack outputStack = new ItemStack(output, 1);
-            itemStacks.put(OUTPUT, outputStack);
+            itemStacks.put(OUTPUT, output);
         }
     }
 
@@ -158,9 +169,6 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
         ItemStack deposit = givenStack.split(1);
 
         itemStacks.put(slot, deposit);
-
-        // Fire Dronez items' NBT building
-        DronezCore.attemptInit(deposit);
 
         attemptProduceOutput();
 
@@ -238,7 +246,7 @@ public class WorkshopAssembleItemHandler implements IItemHandler, IItemHandlerMo
         } else if (slot == SHELL) {
             return stack.getItem() == DronezMod.ironDroneShell || stack.getItem() == DronezMod.goldDroneShell || stack.getItem() == DronezMod.diamondDroneShell;
         } else if (slot == CORE) {
-            return DronezCore.is(stack);
+            return DroneCoreTypeHelper.is(stack);
         }
 
         return false;

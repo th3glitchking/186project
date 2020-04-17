@@ -9,9 +9,7 @@
   "item.dronez.diamond_drone_blade": "Diamond drone blade",
   "item.dronez.diamond_drone_core": "Diamond drone core",
   "item.dronez.diamond_drone_shell": "Diamond drone shell",
-  "item.dronez.iron_drone_spawn_egg": "Drone Spawn Egg",
-  "item.dronez.gold_drone_spawn_egg": "Drone Spawn Egg",
-  "item.dronez.diamond_drone_spawn_egg": "Drone Spawn Egg",
+  "item.dronez.drone_package_item": "Drone Package",
   "block.dronez.charger_block": "Drone Charger",
   "block.dronez.workshop_block": "Drone Workshop"
 }

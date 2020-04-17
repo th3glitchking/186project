@@ -12,7 +12,7 @@ import com.dronez.entities.RenderDroneFactory;
 import com.dronez.entities.storage.StorageContainer;
 import com.dronez.entities.storage.StorageDrone;
 import com.dronez.entities.storage.StorageScreen;
-import com.dronez.items.EggFactory;
+import com.dronez.items.DronePackageItem;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.EntityClassification;
@@ -59,6 +59,7 @@ public class DronezMod {
     public static Item diamondDroneBlade;
     public static Item diamondDroneShell;
     public static Item diamondDroneCore;
+    public static DronePackageItem dronePackageItem;
     static ChargerBlock chargerBlock;
     static BlockItem chargerBlockItem;
     static WorkshopBlock workshopBlock;
@@ -148,14 +149,14 @@ public class DronezMod {
             diamondDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_core");
             chargerBlockItem = (BlockItem)new BlockItem(chargerBlock, new Item.Properties().group(dronezGroup)).setRegistryName(MODID, "charger_block_item");
             workshopBlockItem = (BlockItem)new BlockItem(workshopBlock, new Item.Properties().group(dronezGroup)).setRegistryName(MODID, "workshop_block_item");
+            dronePackageItem = (DronePackageItem)new DronePackageItem().setRegistryName(MODID, DronePackageItem.DRONE_PACKAGE_ITEM_ID);
 
             event.getRegistry().registerAll(
                     ironDroneBlade, ironDroneShell, ironDroneCore,
                     goldDroneBlade, goldDroneShell, goldDroneCore,
                     diamondDroneBlade, diamondDroneCore, diamondDroneShell,
-                    chargerBlockItem, workshopBlockItem
+                    chargerBlockItem, workshopBlockItem, dronePackageItem
             );
-            EggFactory.registerEggs();
         }
 
         @SubscribeEvent

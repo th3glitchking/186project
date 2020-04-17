@@ -1,7 +1,7 @@
 package com.dronez.block.workshop;
 
 import com.dronez.DronezMod;
-import com.dronez.items.DronezCore;
+import com.dronez.items.DroneCoreTypeHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -55,13 +55,13 @@ public class WorkshopAIItemHandler implements IItemHandler, IItemHandlerModifiab
 
         if (itemStacks.get(MODIFIER).getItem() == Items.CHEST) {
             // If chest, set core to storage
-            return DronezCore.CORE_TYPE_STORAGE;
+            return DroneCoreTypeHelper.CORE_TYPE_STORAGE;
         } else if (itemStacks.get(MODIFIER).getItem() == Items.AIR) {
             // If no modifier, reset core to follow
-            return DronezCore.CORE_TYPE_FOLLOW;
+            return DroneCoreTypeHelper.CORE_TYPE_FOLLOW;
         } else {
             // If it's not empty and not a chest, it must be a sword
-            return DronezCore.CORE_TYPE_ATTACK;
+            return DroneCoreTypeHelper.CORE_TYPE_ATTACK;
         }
     }
 
@@ -76,9 +76,9 @@ public class WorkshopAIItemHandler implements IItemHandler, IItemHandlerModifiab
         } else {
             // Output produced
             ItemStack outputStack = new ItemStack(itemStacks.get(CORE).getItem(), 1);
-            DronezCore.setType(outputStack, output);
+            DroneCoreTypeHelper.setType(outputStack, output);
             itemStacks.put(OUTPUT, outputStack);
-            LogManager.getLogger().debug("Output Core Type: {}", DronezCore.getType(outputStack));
+            LogManager.getLogger().debug("Output Core Type: {}", DroneCoreTypeHelper.getType(outputStack));
         }
     }
 
