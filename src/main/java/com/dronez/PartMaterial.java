@@ -3,9 +3,23 @@ package com.dronez;
 import net.minecraft.item.Item;
 
 public class PartMaterial {
+    public static final byte ERROR = -1;
     public static final byte MATERIAL_IRON = 1;
     public static final byte MATERIAL_GOLD = 2;
     public static final byte MATERIAL_DIAMOND = 3;
+
+    public static String stringFrom(byte material) {
+        switch (material) {
+            case MATERIAL_IRON:
+                return "Iron";
+            case MATERIAL_GOLD:
+                return "Gold";
+            case MATERIAL_DIAMOND:
+                return "Diamond";
+            default:
+                throw new IllegalStateException("Material must be a PartMaterial#MATERIAL_* value. Actual: " + material);
+        }
+    }
 
     /**
      * Checks input item to see if it is an item from this mod. If it is, return the type of
@@ -24,6 +38,6 @@ public class PartMaterial {
             return MATERIAL_DIAMOND;
         }
 
-        return -1;
+        return ERROR;
     }
 }

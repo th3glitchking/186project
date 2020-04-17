@@ -1,4 +1,4 @@
-package com.dronez.items;
+package com.dronez.dronedata;
 
 import com.dronez.DronezMod;
 import net.minecraft.entity.EntityType;
@@ -12,31 +12,12 @@ import java.util.List;
 /**
  * Class adding convenience methods for Drone Core items.
  */
-public class DroneCoreTypeHelper {
-    public static final String CORE_TYPE_FOLLOW = "Follow";
-    public static final String CORE_TYPE_ATTACK = "Attack";
-    public static final String CORE_TYPE_STORAGE = "Storage";
-    private static final String CORE_TYPE_TAG = "Type";
-    private static final List<String> TYPES = Arrays.asList(CORE_TYPE_FOLLOW, CORE_TYPE_ATTACK, CORE_TYPE_STORAGE);
-
-    /**
-     * If this stack does not have an existing type, set it to {@link DroneCoreTypeHelper#CORE_TYPE_FOLLOW}.
-     * This is used every time interaction occurs with a Core to make
-     * sure it has a type at the proper time.
-     * @param stack the input stack
-     */
-    public static void attemptInit(ItemStack stack) {
-        // Check if this stack isn't a Core
-        if (!is(stack)) {
-            return;
-        }
-
-        CompoundNBT tag = stack.getTag();
-        if (tag == null || !tag.contains(CORE_TYPE_TAG)) {
-            // If there's no value for the type, set it to follow
-            setType(stack, CORE_TYPE_FOLLOW);
-        }
-    }
+public class DroneCoreAiHelper {
+    public static final byte CORE_TYPE_FOLLOW = 1;
+    public static final byte CORE_TYPE_ATTACK = 2;
+    public static final byte CORE_TYPE_STORAGE = 3;
+    public static final String CORE_TYPE_TAG = "Type";
+    private static final List<Byte> TYPES = Arrays.asList(CORE_TYPE_FOLLOW, CORE_TYPE_ATTACK, CORE_TYPE_STORAGE);
 
     /**
      * Sets the proper tag on an {@link ItemStack} to mark it as a certain
@@ -44,10 +25,10 @@ public class DroneCoreTypeHelper {
      * @param stack the input stack
      * @param type the type of drone. Must be CORE_TYPE_FOLLOW, CORE_TYPE_ATTACK, or CORE_TYPE_STORAGE
      */
-    public static void setType(ItemStack stack, String type) {
-        assertValidCoreType(type);
+    public static void setType(ItemStack stack, byte type) {
+        assertValidCoreAi(type);
         assertValidItemStack(stack);
-        stack.getOrCreateTag().putString(CORE_TYPE_TAG, type);
+        stack.getOrCreateTag().putByte(CORE_TYPE_TAG, type);
     }
 
     /**
@@ -56,19 +37,18 @@ public class DroneCoreTypeHelper {
      * @param stack the input stack
      * @return the potential core type
      */
-    @Nullable
-    public static String getType(ItemStack stack) {
+    public static byte getType(ItemStack stack) {
         assertValidItemStack(stack);
 
         CompoundNBT tag = stack.getTag();
         if (tag == null || !tag.contains(CORE_TYPE_TAG)) {
             // The stack has no tag
-            return null;
+            return -1;
         }
 
-        String coreType = tag.getString(CORE_TYPE_TAG);
+        byte coreType = tag.getByte(CORE_TYPE_TAG);
 
-        assertValidCoreType(coreType);
+        assertValidCoreAi(coreType);
         return coreType;
     }
 
@@ -83,23 +63,37 @@ public class DroneCoreTypeHelper {
                 stack.getItem() == DronezMod.diamondDroneCore;
     }
 
-    public static EntityType<?> from(String type) {
-        assertValidCoreType(type);
-        if (type.equals(CORE_TYPE_FOLLOW)) {
+    public static EntityType<?> from(byte type) {
+        assertValidCoreAi(type);
+        if (type == CORE_TYPE_FOLLOW) {
             return DronezMod.RegistryEvents.drone;
-        } else if (type.equals(CORE_TYPE_ATTACK)) {
+        } else if (type == CORE_TYPE_ATTACK) {
             return DronezMod.RegistryEvents.attack;
-        } else if (type.equals(CORE_TYPE_STORAGE)) {
+        } else if (type == CORE_TYPE_STORAGE) {
             return DronezMod.RegistryEvents.storage;
         }
         throw new IllegalArgumentException("Invalid DronezCore type");
+    }
+
+    @Nullable
+    public static String stringFrom(byte type) {
+        switch (type) {
+            case CORE_TYPE_FOLLOW:
+                return "Follow";
+            case CORE_TYPE_ATTACK:
+                return "Attack";
+            case CORE_TYPE_STORAGE:
+                return "Storage";
+            default:
+                return null;
+        }
     }
 
     /**
      * Throws if the input isn't CORE_TYPE_FOLLOW, CORE_TYPE_ATTACK, or CORE_TYPE_STORAGE
      * @param input the input type
      */
-    private static void assertValidCoreType(String input) {
+    private static void assertValidCoreAi(byte input) {
         if (!TYPES.contains(input)) {
             String msg = String.format("FakeCore type should be of type %s: . Presented: %s", TYPES, input);
             throw new IllegalArgumentException(msg);

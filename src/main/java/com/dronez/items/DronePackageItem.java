@@ -1,6 +1,9 @@
 package com.dronez.items;
 
+import com.dronez.dronedata.DroneCoreAiHelper;
+import com.dronez.dronedata.DroneTagWrapper;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,7 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -17,34 +19,39 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.dronez.DronezMod.RegistryEvents.drone;
 import static com.dronez.DronezMod.dronezGroup;
 
 public class DronePackageItem extends SpawnEggItem {
     public static final String DRONE_PACKAGE_ITEM_ID = "drone_package_item";
-    public static final String DRONE_PACKAGE_TAG_KEY = "DronePackage";
-    public static final String DRONE_PACKAGE_CORE_KEY = "Core";
-    public static final String DRONE_PACKAGE_CORE_TYPE_KEY = "Type";
-    public static final String DRONE_PACKAGE_MATERIAL_KEY = "Material";
 
     public DronePackageItem() {
         super(drone, 0xFFFFFF, 0xFFFFFF, new Item.Properties().group(dronezGroup));
     }
 
     @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        DroneTagWrapper.setTooltip(tooltip, stack.getTag());
+    }
+
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         ItemStack droneEggItemStack = playerIn.getHeldItem(handIn);
-        CompoundNBT eggTags = droneEggItemStack.getChildTag(DRONE_PACKAGE_TAG_KEY);
+        DroneTagWrapper droneTags = new DroneTagWrapper(droneEggItemStack);
 
-        if (eggTags == null) {
+        if (droneTags.isCoreEmpty()) {
             // If there is no Egg tag, Drone could've been created in Creative
             // or spawned in. Use IRON as default
-            eggTags = PackageFactory.allIron();
+            droneTags.fillIron();
         }
 
-        String coreType = eggTags.getCompound(DRONE_PACKAGE_CORE_KEY).getString(DRONE_PACKAGE_CORE_TYPE_KEY);
+        byte coreType = droneTags.getCoreAi();
 
         if (worldIn.isRemote) {
             return new ActionResult<>(ActionResultType.PASS, droneEggItemStack);
@@ -62,7 +69,7 @@ public class DronePackageItem extends SpawnEggItem {
             blockPos = blockPos.offset(blockRayTraceResult.getFace());
         }
 
-        EntityType<?> droneEntity = DroneCoreTypeHelper.from(coreType);
+        EntityType<?> droneEntity = DroneCoreAiHelper.from(coreType);
         if (droneEntity.spawn(worldIn, droneEggItemStack, playerIn, blockPos, SpawnReason.SPAWN_EGG, false, false) == null) {
             return new ActionResult<>(ActionResultType.PASS, droneEggItemStack);
         }
