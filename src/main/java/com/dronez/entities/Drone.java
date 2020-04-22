@@ -45,12 +45,13 @@ import java.util.stream.Stream;
 
 public class Drone extends FlyingEntity {
     // Material type tracking and texture locations
-    protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(Drone.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+    protected static final DataParameter<Optional<UUID>> OWNER_UUID = EntityDataManager.createKey(Drone.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     protected static final DataParameter<Byte> SHELL = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     protected static final DataParameter<Byte> CORE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     protected static final DataParameter<Byte> BLADE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
 
     // Tag keys
+    private final String OWNER_UUID_TAG = "OwnerUUID";
     private final String SHELL_TAG = "Shell";
     private final String BLADE_TAG = "Blade";
     private final String CORE_TAG = "Core";
@@ -66,6 +67,7 @@ public class Drone extends FlyingEntity {
         this.charging = false;
     }
 
+    @Override
     protected void registerAttributes() {
         super.registerAttributes();
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.dataManager.get(CORE));// * this.core.getValue());
@@ -74,10 +76,6 @@ public class Drone extends FlyingEntity {
     }
 
     @Override
-    protected void onDeathUpdate() {
-        super.onDeathUpdate();
-    }
-
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
@@ -95,10 +93,12 @@ public class Drone extends FlyingEntity {
     /**
      * Called when spawned from a Drone Package
      */
-    public void onSpawn(DroneTagWrapper tags) {
+    public void onSpawn(DroneTagWrapper tags, PlayerEntity owner) {
         dataManager.set(BLADE, tags.getBladeMaterial());
         dataManager.set(CORE, tags.getCoreMaterial());
         dataManager.set(SHELL, tags.getShellMaterial());
+        dataManager.set(OWNER_UUID, Optional.of(owner.getUniqueID()));
+
         setCustomAttributes();
     }
 
@@ -118,6 +118,7 @@ public class Drone extends FlyingEntity {
         return battery.getEnergyStored() < battery.getMaxEnergyStored();
     }
 
+    @Override
     public void tick() {
         super.tick();
 
@@ -134,29 +135,29 @@ public class Drone extends FlyingEntity {
     }
 
     /**
-     * Get the position of this entity as a BlockPos
+     * Get the position of this entity as a {@link BlockPos}
      * @return the current position
      */
     public BlockPos getPos() {
         return new BlockPos(posX, posY, posZ);
     }
 
+    @Override
     protected void registerData() {
         super.registerData();
         //and then add any other data that needs to be registered upon spawning
-        this.dataManager.register(OWNER_UNIQUE_ID, Optional.empty());
+        this.dataManager.register(OWNER_UUID, Optional.empty());
         this.dataManager.register(SHELL, PartMaterial.MATERIAL_IRON);
         this.dataManager.register(CORE, PartMaterial.MATERIAL_IRON);
         this.dataManager.register(BLADE, PartMaterial.MATERIAL_IRON);
     }
 
+    @Override
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
 
-        if (this.getOwnerId() == null) {
-            compound.putString("OwnerUUID", "");
-        } else {
-            compound.putString("OwnerUUID", this.getOwnerId().toString());
+        if (this.dataManager.get(OWNER_UUID).isPresent()) {
+            compound.putString(OWNER_UUID_TAG, this.dataManager.get(OWNER_UUID).get().toString());
         }
 
         compound.putByte(SHELL_TAG, this.dataManager.get(SHELL));
@@ -164,29 +165,32 @@ public class Drone extends FlyingEntity {
         compound.putByte(BLADE_TAG, this.dataManager.get(BLADE));
     }
 
+    @Override
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        String s;
+        String ownerUUIDString;
 
-        if (compound.contains("OwnerUUID", 8)) {
-            s = compound.getString("OwnerUUID");
+        if (compound.contains(OWNER_UUID_TAG, 8)) {
+            ownerUUIDString = compound.getString(OWNER_UUID_TAG);
         } else {
             String s1 = compound.getString("Owner");
-            s = PreYggdrasilConverter.convertMobOwnerIfNeeded(Objects.requireNonNull(this.getServer()), s1);
+            ownerUUIDString = PreYggdrasilConverter.convertMobOwnerIfNeeded(Objects.requireNonNull(this.getServer()), s1);
         }
 
-        if (!s.isEmpty()) {
+        if (!ownerUUIDString.isEmpty()) {
             try {
-                this.setOwnerId(UUID.fromString(s));
+                setOwnerId(UUID.fromString(ownerUUIDString));
             } catch (Throwable var4) {
-                this.setOwnerId(Objects.requireNonNull(this.world.getClosestPlayer(this, 100)).getUniqueID());
+                PlayerEntity closestPlayer = this.world.getClosestPlayer(this, 100);
+                if (closestPlayer != null) {
+                    setOwnerId(closestPlayer.getUniqueID());
+                }
             }
         }
 
         this.dataManager.set(SHELL, compound.getByte(SHELL_TAG));
         this.dataManager.set(CORE, compound.getByte(CORE_TAG));
         this.dataManager.set(BLADE, compound.getByte(BLADE_TAG));
-        super.readAdditional(compound);
     }
 
     @Override
@@ -202,17 +206,18 @@ public class Drone extends FlyingEntity {
         this.entityDropItem(new ItemStack(dropItem, 4));
     }
 
+    @Override
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 0.3F;
     }
 
     @Nullable
     public UUID getOwnerId() {
-        return this.dataManager.get(OWNER_UNIQUE_ID).orElse((UUID)null);
+        return this.dataManager.get(OWNER_UUID).orElse(null);
     }
 
-    public void setOwnerId(@Nullable UUID p_184754_1_) {
-        this.dataManager.set(OWNER_UNIQUE_ID, Optional.ofNullable(p_184754_1_));
+    public void setOwnerId(@Nullable UUID uuid) {
+        this.dataManager.set(OWNER_UUID, Optional.ofNullable(uuid));
     }
 
     @Nullable
@@ -312,6 +317,7 @@ public class Drone extends FlyingEntity {
         /**
          * Returns whether the EntityAIBase should begin execution.
          */
+        @Override
         public boolean shouldExecute() {
             LivingEntity livingentity = this.drone.getOwner();
             if (livingentity == null) {

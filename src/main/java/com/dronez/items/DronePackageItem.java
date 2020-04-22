@@ -76,7 +76,7 @@ public class DronePackageItem extends SpawnEggItem {
             return new ActionResult<>(ActionResultType.PASS, droneEggItemStack);
         }
 
-        droneEntity.onSpawn(droneTags);
+        droneEntity.onSpawn(droneTags, playerIn);
 
         if (coreType == DroneCoreAiHelper.CORE_TYPE_STORAGE)
             droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.CHEST));
