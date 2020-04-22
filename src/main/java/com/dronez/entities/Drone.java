@@ -11,6 +11,7 @@ import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -64,7 +65,18 @@ public class Drone extends FlyingEntity {
         this.charging = false;
     }
 
+    protected void registerAttributes() {
+        super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.dataManager.get(CORE));// * this.core.getValue());
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D * this.dataManager.get(BLADE));// * this.blade.getValue());
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.dataManager.get(SHELL));// * this.shell.getValue());
+    }
+
     @Override
+    protected void onDeathUpdate() {
+        super.onDeathUpdate();
+    }
+
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
@@ -176,6 +188,11 @@ public class Drone extends FlyingEntity {
         super.readAdditional(compound);
     }
 
+    @Override
+    public void onDeath(DamageSource cause) {
+        super.onDeath(cause);
+        this.entityDropItem(new ItemStack(Items.IRON_INGOT, 4));
+    }
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 0.3F;
     }

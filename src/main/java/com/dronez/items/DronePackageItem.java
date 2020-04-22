@@ -77,6 +77,12 @@ public class DronePackageItem extends SpawnEggItem {
 
         droneEntity.onSpawn(droneTags);
 
+        if (coreType == DroneCoreAiHelper.CORE_TYPE_STORAGE)
+            droneEntity.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CHEST));
+        else if (coreType == DroneCoreAiHelper.CORE_TYPE_ATTACK) {
+            droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(getSwordType(droneTags.getCoreMaterial())));
+        }
+
         if (!playerIn.abilities.isCreativeMode) {
             droneEggItemStack.shrink(1);
         }
@@ -89,6 +95,10 @@ public class DronePackageItem extends SpawnEggItem {
     public ActionResultType onItemUse(ItemUseContext context) {
         // Don't allow default spawning of Entity. We do it ourselves in onItemRightClick
         return ActionResultType.PASS;
+    }
+
+    private Item getSwordType(byte coreType) {
+        return Items.DIAMOND_SWORD;
     }
 }
 
