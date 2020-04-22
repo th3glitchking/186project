@@ -2,6 +2,7 @@ package com.dronez.entities;
 
 import com.dronez.block.charger.ChargerBlockEnergy;
 import com.dronez.block.charger.ChargerBlockTileEntity;
+import com.dronez.dronedata.DroneTagWrapper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.*;
@@ -28,6 +29,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.EnergyStorage;
@@ -68,6 +71,14 @@ public class Drone extends FlyingEntity {
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
+    }
+
+    /**
+     * Called when spawned from a Drone Package
+     */
+    public void onSpawn(DroneTagWrapper tags) {
+        byte bladeMaterial = tags.getBladeMaterial();
+        LOGGER.info("Blade: {}", bladeMaterial);
     }
 
     /**

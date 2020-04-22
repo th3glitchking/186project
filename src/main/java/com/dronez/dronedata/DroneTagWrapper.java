@@ -55,6 +55,10 @@ public class DroneTagWrapper {
         return stack.getChildTag(DRONE_PACKAGE_TAG_KEY).getCompound(DRONE_PACKAGE_CORE_KEY).getByte(DRONE_PACKAGE_CORE_AI_KEY);
     }
 
+    public byte getBladeMaterial() {
+        return stack.getChildTag(DRONE_PACKAGE_TAG_KEY).getCompound(DRONE_PACKAGE_BLADES_KEY).getByte(DRONE_PACKAGE_MATERIAL_KEY);
+    }
+
     public static void setTooltip(List<ITextComponent> tooltip, CompoundNBT tag) {
         if (tag == null) {
             return;
