@@ -5,6 +5,7 @@ import com.dronez.PartMaterial;
 import com.dronez.dronedata.DroneCoreAiHelper;
 import com.dronez.dronedata.DroneTagFactory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -43,6 +44,10 @@ public class WorkshopAssembleItemHandler extends WorkshopAbstractItemHandler {
      * @return the egg the input is able to craft
      */
     public ItemStack determineOutput() {
+        if (itemStacks.get(CORE).getItem() == Items.AIR) {
+            return ItemStack.EMPTY;
+        }
+
         byte shellMaterial = PartMaterial.fromItem(itemStacks.get(SHELL).getItem());
         if (shellMaterial == -1) {
             return ItemStack.EMPTY;
