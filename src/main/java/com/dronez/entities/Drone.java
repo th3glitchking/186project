@@ -1,5 +1,6 @@
 package com.dronez.entities;
 
+import com.dronez.PartMaterial;
 import com.dronez.block.charger.ChargerBlockEnergy;
 import com.dronez.block.charger.ChargerBlockTileEntity;
 import com.dronez.dronedata.DroneTagWrapper;
@@ -9,6 +10,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -43,12 +45,16 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class Drone extends FlyingEntity {
-
     // Material type tracking and texture locations
     protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(Drone.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     protected static final DataParameter<Byte> SHELL = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     protected static final DataParameter<Byte> CORE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
     protected static final DataParameter<Byte> BLADE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
+
+    // Tag keys
+    private final String SHELL_TAG = "Shell";
+    private final String BLADE_TAG = "Blade";
+    private final String CORE_TAG = "Core";
 
     // Energy tracking
     private final EnergyStorage battery;
@@ -61,24 +67,29 @@ public class Drone extends FlyingEntity {
         this.charging = false;
     }
 
-    protected void registerAttributes() {
-        super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.dataManager.get(CORE));// * this.core.getValue());
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D * this.dataManager.get(BLADE));// * this.blade.getValue());
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.dataManager.get(SHELL));// * this.shell.getValue());
-    }
-
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
         this.goalSelector.addGoal(10, new ChargingGoal(this));
     }
 
     /**
+     * Set attributes that rely on core, blade and shell
+     */
+    private void setCustomAttributes() {
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.dataManager.get(CORE));
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D * this.dataManager.get(BLADE));
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.dataManager.get(SHELL));
+    }
+
+    /**
      * Called when spawned from a Drone Package
      */
     public void onSpawn(DroneTagWrapper tags) {
-        byte bladeMaterial = tags.getBladeMaterial();
-        LOGGER.info("Blade: {}", bladeMaterial);
+        dataManager.set(BLADE, tags.getBladeMaterial());
+        dataManager.set(CORE, tags.getCoreMaterial());
+        dataManager.set(SHELL, tags.getShellMaterial());
+        setCustomAttributes();
     }
 
     /**
@@ -124,9 +135,9 @@ public class Drone extends FlyingEntity {
         super.registerData();
         //and then add any other data that needs to be registered upon spawning
         this.dataManager.register(OWNER_UNIQUE_ID, Optional.empty());
-        this.dataManager.register(SHELL, (byte)1);
-        this.dataManager.register(CORE, (byte)1);
-        this.dataManager.register(BLADE, (byte)1);
+        this.dataManager.register(SHELL, PartMaterial.MATERIAL_IRON);
+        this.dataManager.register(CORE, PartMaterial.MATERIAL_IRON);
+        this.dataManager.register(BLADE, PartMaterial.MATERIAL_IRON);
     }
 
     public void writeAdditional(CompoundNBT compound) {
@@ -138,10 +149,9 @@ public class Drone extends FlyingEntity {
             compound.putString("OwnerUUID", this.getOwnerId().toString());
         }
 
-        compound.putByte("Shell", this.dataManager.get(SHELL));
-        compound.putByte("Core", this.dataManager.get(CORE));
-        compound.putByte("Blade", this.dataManager.get(BLADE));
-        compound.putBoolean("Charging", this.isCharging());
+        compound.putByte(SHELL_TAG, this.dataManager.get(SHELL));
+        compound.putByte(CORE_TAG, this.dataManager.get(CORE));
+        compound.putByte(BLADE_TAG, this.dataManager.get(BLADE));
     }
 
     public void readAdditional(CompoundNBT compound) {
@@ -163,14 +173,11 @@ public class Drone extends FlyingEntity {
             }
         }
 
-        this.dataManager.set(SHELL, compound.getByte("Shell"));
-        this.dataManager.set(CORE, compound.getByte("Core"));
-        this.dataManager.set(BLADE, compound.getByte("Blade"));
+        this.dataManager.set(SHELL, compound.getByte(SHELL_TAG));
+        this.dataManager.set(CORE, compound.getByte(CORE_TAG));
+        this.dataManager.set(BLADE, compound.getByte(BLADE_TAG));
         super.readAdditional(compound);
     }
-
-
-
 
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 0.3F;
@@ -194,6 +201,7 @@ public class Drone extends FlyingEntity {
             return null;
         }
     }
+
     public byte getShell() {
         return this.dataManager.get(SHELL);
     }

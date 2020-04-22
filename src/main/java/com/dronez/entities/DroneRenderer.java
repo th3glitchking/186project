@@ -23,7 +23,7 @@ public class DroneRenderer extends MobRenderer<Drone, DroneModel<Drone>> {
     @Nullable
     @Override
     protected ResourceLocation getEntityTexture(Drone entity) {
-        switch (entity.getShell()){
+        switch (entity.getShell()) {
             case 1:
                 return IRON;
             case 2:
