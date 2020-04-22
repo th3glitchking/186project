@@ -24,6 +24,7 @@ run
 # Files from Forge MDK
 forge*changelog.txt
 
+local.properties
 
 # Created by https://www.gitignore.io/api/macos
 # Edit at https://www.gitignore.io/?templates=macos

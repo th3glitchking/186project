@@ -14,6 +14,8 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.dronez.dronedata.DroneTagWrapper.DRONE_PACKAGE_CORE_AI_KEY;
+
 public class DroneCoreItem extends Item {
     public DroneCoreItem() {
         super(new Item.Properties().group(DronezMod.dronezGroup).maxStackSize(1));
@@ -32,7 +34,7 @@ public class DroneCoreItem extends Item {
             return;
         }
 
-        byte aiType = tag.getByte(DroneCoreAiHelper.CORE_TYPE_TAG);
+        byte aiType = tag.getByte(DRONE_PACKAGE_CORE_AI_KEY);
         tooltip.add(new StringTextComponent("AI: " + DroneCoreAiHelper.stringFrom(aiType)));
     }
 }
