@@ -1,5 +1,6 @@
 package com.dronez.items;
 
+import com.dronez.PartMaterial;
 import com.dronez.dronedata.DroneCoreAiHelper;
 import com.dronez.dronedata.DroneTagWrapper;
 import com.dronez.entities.Drone;
@@ -78,9 +79,9 @@ public class DronePackageItem extends SpawnEggItem {
         droneEntity.onSpawn(droneTags);
 
         if (coreType == DroneCoreAiHelper.CORE_TYPE_STORAGE)
-            droneEntity.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CHEST));
+            droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.CHEST));
         else if (coreType == DroneCoreAiHelper.CORE_TYPE_ATTACK) {
-            droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(getSwordType(droneTags.getCoreMaterial())));
+            droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, getSwordType(droneTags.getCoreMaterial()));
         }
 
         if (!playerIn.abilities.isCreativeMode) {
@@ -97,8 +98,15 @@ public class DronePackageItem extends SpawnEggItem {
         return ActionResultType.PASS;
     }
 
-    private Item getSwordType(byte coreType) {
-        return Items.DIAMOND_SWORD;
+    private ItemStack getSwordType(byte coreType) {
+        if (coreType == PartMaterial.MATERIAL_IRON)
+            return new ItemStack(Items.IRON_SWORD);
+        else if (coreType == PartMaterial.MATERIAL_GOLD)
+            return new ItemStack(Items.GOLDEN_SWORD);
+        else if (coreType == PartMaterial.MATERIAL_DIAMOND)
+            return new ItemStack(Items.DIAMOND_SWORD);
+
+        return null;
     }
 }
 

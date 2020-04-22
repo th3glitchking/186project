@@ -10,6 +10,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -191,8 +192,16 @@ public class Drone extends FlyingEntity {
     @Override
     public void onDeath(DamageSource cause) {
         super.onDeath(cause);
-        this.entityDropItem(new ItemStack(Items.IRON_INGOT, 4));
+
+        Item dropItem = Items.IRON_INGOT;
+        if (dataManager.get(SHELL) == PartMaterial.MATERIAL_GOLD)
+            dropItem = Items.GOLD_INGOT;
+        else if (dataManager.get(SHELL) == PartMaterial.MATERIAL_DIAMOND)
+            dropItem = Items.DIAMOND;
+
+        this.entityDropItem(new ItemStack(dropItem, 4));
     }
+
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 0.3F;
     }
