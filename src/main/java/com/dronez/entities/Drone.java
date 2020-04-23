@@ -37,6 +37,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.energy.EnergyStorage;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.lang.ref.WeakReference;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,10 +61,12 @@ public class Drone extends FlyingEntity {
     // Energy tracking
     private final EnergyStorage battery;
     private boolean charging;
+    private int previousChargeValue;
 
-    public Drone(EntityType<Drone> type, World p_i48578_2_) {
-        super(type, p_i48578_2_);
+    public Drone(EntityType<Drone> type, World worldIn) {
+        super(type, worldIn);
         this.moveController = new MoveHelperController(this);
+        this.navigator = new FlyingPathNavigator(this, worldIn);
         this.battery = new EnergyStorage(10000, 10000, 10000, 10000);
         this.charging = false;
     }
@@ -77,8 +81,8 @@ public class Drone extends FlyingEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new Drone.FollowOwner(this, this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue(), 10.0F, 2.0F));
-        this.goalSelector.addGoal(10, new ChargingGoal(this));
+        this.goalSelector.addGoal(1, new FollowOwner(this, 8.0F, 2.0F));
+        this.goalSelector.addGoal(2, new ChargingGoal(this));
     }
 
     /**
@@ -86,8 +90,17 @@ public class Drone extends FlyingEntity {
      */
     private void setCustomAttributes() {
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D * this.dataManager.get(CORE));
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(2.0D * this.dataManager.get(BLADE));
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D * this.dataManager.get(SHELL));
+        updateSpeed();
+    }
+
+    private void updateSpeed() {
+        double baseValue = 2.0D * this.dataManager.get(BLADE);
+        if (battery.getEnergyStored() == 0) {
+            baseValue /= 2;
+        }
+        LOGGER.info("Setting drone speed to {}", baseValue);
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(baseValue);
     }
 
     /**
@@ -100,6 +113,10 @@ public class Drone extends FlyingEntity {
         dataManager.set(OWNER_UUID, Optional.of(owner.getUniqueID()));
 
         setCustomAttributes();
+    }
+
+    public double getSpeed() {
+        return getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
     }
 
     /**
@@ -123,14 +140,19 @@ public class Drone extends FlyingEntity {
         super.tick();
 
         if (!charging && ticksExisted % 10 == 0) {
-            int previousEnergy = battery.getEnergyStored();
+            previousChargeValue = battery.getEnergyStored();
             battery.extractEnergy(1, false);
-            if (battery.getEnergyStored() == 0 && previousEnergy != 0) {
+            if (battery.getEnergyStored() == 0 && previousChargeValue != 0) {
                 // Just ran out of battery
-                if (!world.isRemote) {
-                    say("Shutting down...");
-                }
+                LOGGER.info("Trying to set speed to half");
+                updateSpeed();
             }
+        }
+
+        if (charging && previousChargeValue == 0 && battery.getEnergyStored() > 0) {
+            // We've gotten at least 1 more FE since last tick.
+            LOGGER.info("Trying to set speed to normal");
+            updateSpeed();
         }
     }
 
@@ -221,7 +243,7 @@ public class Drone extends FlyingEntity {
     }
 
     @Nullable
-    public LivingEntity getOwner() {
+    public PlayerEntity getOwner() {
         try {
             UUID uuid = this.getOwnerId();
             return uuid == null ? null : this.world.getPlayerByUuid(uuid);
@@ -292,20 +314,11 @@ public class Drone extends FlyingEntity {
 
     static class FollowOwner extends Goal {
         protected final Drone drone;
-        private LivingEntity owner;
-        protected final IWorldReader world;
-        private final double followSpeed;
-        private final PathNavigator navigator;
-        private int timeToRecalcPath;
         private final float maxDist;
         private final float minDist;
-        private float oldWaterCost;
 
-        public FollowOwner(Drone droneIn, double followSpeedIn, float minDistIn, float maxDistIn) {
+        public FollowOwner(Drone droneIn, float minDistIn, float maxDistIn) {
             this.drone = droneIn;
-            this.world = droneIn.world;
-            this.followSpeed = followSpeedIn;
-            this.navigator = droneIn.getNavigator();
             this.minDist = minDistIn;
             this.maxDist = maxDistIn;
             this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
@@ -319,80 +332,42 @@ public class Drone extends FlyingEntity {
          */
         @Override
         public boolean shouldExecute() {
-            LivingEntity livingentity = this.drone.getOwner();
-            if (livingentity == null) {
+            PlayerEntity droneOwner = drone.getOwner();
+            if (droneOwner == null || droneOwner.isSpectator() || drone.isCharging()) {
                 return false;
-            } else if (livingentity instanceof PlayerEntity && ((PlayerEntity)livingentity).isSpectator()) {
-                return false;
-            } else if (this.drone.isCharging()) {
-                return false;
-            } else if (this.drone.getDistanceSq(livingentity) < (double)(this.minDist * this.minDist)) {
-                return false;
-            } else {
-                this.owner = livingentity;
-                return true;
             }
+
+            return drone.getDistanceSq(droneOwner) >= this.minDist * this.minDist;
         }
 
         /**
          * Returns whether an in-progress EntityAIBase should continue executing
          */
         public boolean shouldContinueExecuting() {
-            return !this.navigator.noPath() && this.drone.getDistanceSq(this.owner) > (double)(this.maxDist * this.maxDist) && !this.drone.isCharging();
-        }
+            if (drone.getOwner() == null) {
+                return false;
+            }
 
-        /**
-         * Execute a one shot task or start executing a continuous task
-         */
-        public void startExecuting() {
-            this.timeToRecalcPath = 0;
-            this.oldWaterCost = this.drone.getPathPriority(PathNodeType.WATER);
-            this.drone.setPathPriority(PathNodeType.WATER, 0.0F);
+            return !drone.getNavigator().noPath() && drone.getDistanceSq(drone.getOwner()) > (this.maxDist * this.maxDist) && !drone.isCharging();
         }
 
         /**
          * Reset the task's internal state. Called when this task is interrupted by another one
          */
         public void resetTask() {
-            this.owner = null;
-            this.navigator.clearPath();
-            this.drone.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
+            drone.getNavigator().clearPath();
         }
 
         /**
          * Keep ticking a continuous task that has already been started
          */
         public void tick() {
-            this.drone.getLookController().setLookPositionWithEntity(this.owner, 10.0F, (float)this.drone.getVerticalFaceSpeed());
-            if (!this.drone.isCharging()) {
-                if (--this.timeToRecalcPath <= 0) {
-                    this.timeToRecalcPath = 10;
-                    if (!this.navigator.tryMoveToEntityLiving(this.owner, this.followSpeed)) {
-                        if (!this.drone.getLeashed() && !this.drone.isPassenger()) {
-                            if (!(this.drone.getDistanceSq(this.owner) < 144.0D)) {
-                                int i = MathHelper.floor(this.owner.posX) - 2;
-                                int j = MathHelper.floor(this.owner.posZ) - 2;
-                                int k = MathHelper.floor(this.owner.getBoundingBox().minY);
-
-                                for(int l = 0; l <= 4; ++l) {
-                                    for(int i1 = 0; i1 <= 4; ++i1) {
-                                        if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && this.canTeleportToBlock(new BlockPos(i + l, k - 1, j + i1))) {
-                                            this.drone.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.drone.rotationYaw, this.drone.rotationPitch);
-                                            this.navigator.clearPath();
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (drone.getOwner() == null || drone.isCharging()) {
+                return;
             }
-        }
 
-        protected boolean canTeleportToBlock(BlockPos pos) {
-            BlockState blockstate = this.world.getBlockState(pos);
-            return (blockstate.func_215682_a(this.world, pos, this.drone) || blockstate.isIn(BlockTags.LEAVES)) && this.world.isAirBlock(pos.up()) && this.world.isAirBlock(pos.up(2));
+            drone.getLookController().setLookPositionWithEntity(drone.getOwner(), 10.0F, (float) drone.getVerticalFaceSpeed());
+            drone.getNavigator().tryMoveToXYZ(drone.getOwner().posX, drone.getOwner().posY + 5, drone.getOwner().posZ, drone.getSpeed());
         }
     }
 
@@ -444,6 +419,13 @@ public class Drone extends FlyingEntity {
         }
 
         @Override
+        public void resetTask() {
+            chargerPos = null;
+            targetPos = null;
+            energySource = null;
+        }
+
+        @Override
         public boolean shouldContinueExecuting() {
             // If we don't need a charge anymore, we should exit
             if (!drone.needsCharge()) {
@@ -457,8 +439,7 @@ public class Drone extends FlyingEntity {
             }
 
             // If the block disappears, stop charging
-            TileEntity te = drone.world.getTileEntity(chargerPos);
-            return te instanceof ChargerBlockTileEntity;
+            return isChargerBlock(chargerPos);
         }
 
         /**
@@ -520,7 +501,7 @@ public class Drone extends FlyingEntity {
 
                 // Get closer to charger
                 drone.getMoveHelper().setMoveTo(targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1D);
-                //DronezUtils.debug(String.format("(%s) -> (%s)", drone.getPos(), targetPos));
+                //LOGGER.info("({}) -> ({})", drone.getPos(), targetPos);
             }
         }
     }
