@@ -11,6 +11,8 @@ import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraft.entity.ai.goal.OwnerHurtByTargetGoal;
 import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
@@ -18,8 +20,6 @@ import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
 import java.util.EnumSet;
 
 public class AttackDrone extends Drone {
-
-
     public AttackDrone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
     }
@@ -34,7 +34,6 @@ public class AttackDrone extends Drone {
     }
 
     public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner) {
-
         if (target instanceof Drone) {
             Drone drone = (Drone) target;
             if (drone.getOwner() == owner) {

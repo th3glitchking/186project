@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.dronez.dronedata.DroneTagWrapper.DRONE_PACKAGE_CORE_AI_KEY;
+
 /**
  * Class adding convenience methods for Drone Core items.
  */
@@ -16,7 +18,6 @@ public class DroneCoreAiHelper {
     public static final byte CORE_TYPE_FOLLOW = 1;
     public static final byte CORE_TYPE_ATTACK = 2;
     public static final byte CORE_TYPE_STORAGE = 3;
-    public static final String CORE_TYPE_TAG = "Type";
     private static final List<Byte> TYPES = Arrays.asList(CORE_TYPE_FOLLOW, CORE_TYPE_ATTACK, CORE_TYPE_STORAGE);
 
     /**
@@ -28,7 +29,7 @@ public class DroneCoreAiHelper {
     public static void setType(ItemStack stack, byte type) {
         assertValidCoreAi(type);
         assertValidItemStack(stack);
-        stack.getOrCreateTag().putByte(CORE_TYPE_TAG, type);
+        stack.getOrCreateTag().putByte(DRONE_PACKAGE_CORE_AI_KEY, type);
     }
 
     /**
@@ -41,12 +42,12 @@ public class DroneCoreAiHelper {
         assertValidItemStack(stack);
 
         CompoundNBT tag = stack.getTag();
-        if (tag == null || !tag.contains(CORE_TYPE_TAG)) {
+        if (tag == null || !tag.contains(DRONE_PACKAGE_CORE_AI_KEY)) {
             // The stack has no tag
             return -1;
         }
 
-        byte coreType = tag.getByte(CORE_TYPE_TAG);
+        byte coreType = tag.getByte(DRONE_PACKAGE_CORE_AI_KEY);
 
         assertValidCoreAi(coreType);
         return coreType;

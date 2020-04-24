@@ -1,16 +1,17 @@
 package com.dronez.items;
 
+import com.dronez.PartMaterial;
 import com.dronez.dronedata.DroneCoreAiHelper;
 import com.dronez.dronedata.DroneTagWrapper;
+import com.dronez.entities.Drone;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.SpawnEggItem;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.*;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -69,9 +70,18 @@ public class DronePackageItem extends SpawnEggItem {
             blockPos = blockPos.offset(blockRayTraceResult.getFace());
         }
 
-        EntityType<?> droneEntity = DroneCoreAiHelper.from(coreType);
-        if (droneEntity.spawn(worldIn, droneEggItemStack, playerIn, blockPos, SpawnReason.SPAWN_EGG, false, false) == null) {
+        EntityType<?> droneEntityType = DroneCoreAiHelper.from(coreType);
+        Drone droneEntity = (Drone)droneEntityType.spawn(worldIn, droneEggItemStack, playerIn, blockPos, SpawnReason.SPAWN_EGG, false, false);
+        if (droneEntity == null) {
             return new ActionResult<>(ActionResultType.PASS, droneEggItemStack);
+        }
+
+        droneEntity.onSpawn(droneTags, playerIn);
+
+        if (coreType == DroneCoreAiHelper.CORE_TYPE_STORAGE)
+            droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.CHEST));
+        else if (coreType == DroneCoreAiHelper.CORE_TYPE_ATTACK) {
+            droneEntity.setItemStackToSlot(EquipmentSlotType.MAINHAND, getSwordType(droneTags.getCoreMaterial()));
         }
 
         if (!playerIn.abilities.isCreativeMode) {
@@ -86,6 +96,17 @@ public class DronePackageItem extends SpawnEggItem {
     public ActionResultType onItemUse(ItemUseContext context) {
         // Don't allow default spawning of Entity. We do it ourselves in onItemRightClick
         return ActionResultType.PASS;
+    }
+
+    private ItemStack getSwordType(byte coreType) {
+        if (coreType == PartMaterial.MATERIAL_IRON)
+            return new ItemStack(Items.IRON_SWORD);
+        else if (coreType == PartMaterial.MATERIAL_GOLD)
+            return new ItemStack(Items.GOLDEN_SWORD);
+        else if (coreType == PartMaterial.MATERIAL_DIAMOND)
+            return new ItemStack(Items.DIAMOND_SWORD);
+
+        return null;
     }
 }
 

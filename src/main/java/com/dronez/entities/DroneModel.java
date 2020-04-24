@@ -1,5 +1,6 @@
 package com.dronez.entities;
 
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.model.ModelBox;
@@ -7,7 +8,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class DroneModel<T extends Drone> extends EntityModel<T> {
+public class DroneModel<T extends Drone> extends BipedModel<T> {
 
 	// The main groups for the drone model
 	private final RendererModel bb_main;

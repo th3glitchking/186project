@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -31,6 +32,12 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
     public StorageDrone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
         this.inv = new Inventory(27);
+    }
+
+    @Override
+    public void onDeath(DamageSource cause) {
+        super.onDeath(cause);
+        // TODO - drop all items in chest
     }
 
     public void writeAdditional(CompoundNBT compound) {
