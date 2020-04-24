@@ -12,7 +12,8 @@ import com.dronez.entities.RenderDroneFactory;
 import com.dronez.entities.storage.StorageContainer;
 import com.dronez.entities.storage.StorageDrone;
 import com.dronez.entities.storage.StorageScreen;
-import com.dronez.items.EggFactory;
+import com.dronez.items.DroneCoreItem;
+import com.dronez.items.DronePackageItem;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.EntityClassification;
@@ -52,13 +53,14 @@ public class DronezMod {
 
     public static Item ironDroneBlade;
     public static Item ironDroneShell;
-    public static Item ironDroneCore;
+    public static DroneCoreItem ironDroneCore;
     public static Item goldDroneBlade;
     public static Item goldDroneShell;
-    public static Item goldDroneCore;
+    public static DroneCoreItem goldDroneCore;
     public static Item diamondDroneBlade;
     public static Item diamondDroneShell;
-    public static Item diamondDroneCore;
+    public static DroneCoreItem diamondDroneCore;
+    public static DronePackageItem dronePackageItem;
     static ChargerBlock chargerBlock;
     static BlockItem chargerBlockItem;
     static WorkshopBlock workshopBlock;
@@ -139,23 +141,23 @@ public class DronezMod {
             LOGGER.debug("Dronez: Registering Items...");
             ironDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_blade");
             ironDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_shell");
-            ironDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:iron_drone_core");
+            ironDroneCore = (DroneCoreItem)new DroneCoreItem().setRegistryName(MODID, "iron_drone_core");
             goldDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:gold_drone_blade");
             goldDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:gold_drone_shell");
-            goldDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:gold_drone_core");
+            goldDroneCore = (DroneCoreItem)new DroneCoreItem().setRegistryName("dronez:gold_drone_core");
             diamondDroneBlade = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_blade");
             diamondDroneShell = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_shell");
-            diamondDroneCore = new Item(new Item.Properties().group(dronezGroup)).setRegistryName("dronez:diamond_drone_core");
+            diamondDroneCore = (DroneCoreItem)new DroneCoreItem().setRegistryName("dronez:diamond_drone_core");
             chargerBlockItem = (BlockItem)new BlockItem(chargerBlock, new Item.Properties().group(dronezGroup)).setRegistryName(MODID, "charger_block_item");
             workshopBlockItem = (BlockItem)new BlockItem(workshopBlock, new Item.Properties().group(dronezGroup)).setRegistryName(MODID, "workshop_block_item");
+            dronePackageItem = (DronePackageItem)new DronePackageItem().setRegistryName(MODID, DronePackageItem.DRONE_PACKAGE_ITEM_ID);
 
             event.getRegistry().registerAll(
                     ironDroneBlade, ironDroneShell, ironDroneCore,
                     goldDroneBlade, goldDroneShell, goldDroneCore,
                     diamondDroneBlade, diamondDroneCore, diamondDroneShell,
-                    chargerBlockItem, workshopBlockItem
+                    chargerBlockItem, workshopBlockItem, dronePackageItem
             );
-            EggFactory.registerEggs();
         }
 
         @SubscribeEvent

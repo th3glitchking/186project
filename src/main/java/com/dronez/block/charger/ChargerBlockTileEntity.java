@@ -21,7 +21,7 @@ public class ChargerBlockTileEntity extends TileEntity implements Supplier<Charg
     public static final TileEntityType<ChargerBlockTileEntity> TYPE = (TileEntityType<ChargerBlockTileEntity>)TileEntityType.Builder.create(ChargerBlockTileEntity::new, ChargerBlock.CHARGER_BLOCK).build(null).setRegistryName("dronez", "charger_block");
     private static final String COMPOUND_ENERGY_NAME = "Energy";
 
-    private ChargerBlockEnergy energyStorage;
+    private final ChargerBlockEnergy energyStorage;
 
     public ChargerBlockTileEntity() {
         super(TYPE);

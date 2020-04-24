@@ -26,20 +26,20 @@ public class WorkshopContainer extends Container {
             (windowId, inv, data) -> new WorkshopContainer(windowId, Minecraft.getInstance().world, data.readBlockPos(), inv)
     ).setRegistryName(DronezMod.MODID, WorkshopBlock.REGISTRY_NAME);
 
-    private WorkshopTileEntity te;
-    private InvWrapper inv;
-    private WorkshopAssembleItemHandler assembleItemInv;
-    private WorkshopAIItemHandler aiItemInv;
+    private final WorkshopTileEntity te;
+    private final InvWrapper inv;
+    private final WorkshopAssembleItemHandler assembleItemInv;
+    private final WorkshopAIItemHandler aiItemInv;
 
     /**
      * The slot handlers that are apart of the ASSEMBLE WorkshopDisplayType
      */
-    private ArrayList<WorkshopHideableSlotHandler> assembleSlots;
+    private final ArrayList<WorkshopHideableSlotHandler> assembleSlots;
 
     /**
      * The slot handlers that are apart of the AI WorkshopDisplayType
      */
-    private ArrayList<WorkshopHideableSlotHandler> aiSlots;
+    private final ArrayList<WorkshopHideableSlotHandler> aiSlots;
 
     /**
      * The starting slot number of the current inventory
@@ -70,7 +70,7 @@ public class WorkshopContainer extends Container {
     public boolean canInteractWith(PlayerEntity playerIn) {
         World world = te.getWorld();
         if (world == null) {
-            LogManager.getLogger().warn("WorkshopContainer TileEntity's world is null");
+            LogManager.getLogger().error("WorkshopContainer TileEntity's world is null");
             return false;
         }
 
@@ -87,6 +87,7 @@ public class WorkshopContainer extends Container {
             aiSlots.forEach(WorkshopHideableSlotHandler::hide);
             assembleSlots.forEach(WorkshopHideableSlotHandler::show);
 
+            // Set the effective slot range for shift-clicking
             startSlotNumber = assembleSlots.get(0).slotNumber;
             endSlotNumber = assembleSlots.get(assembleSlots.size()-1).slotNumber;
         } else {
@@ -94,6 +95,7 @@ public class WorkshopContainer extends Container {
             aiSlots.forEach(WorkshopHideableSlotHandler::show);
             assembleSlots.forEach(WorkshopHideableSlotHandler::hide);
 
+            // Set the effective slot range for shift-clicking
             startSlotNumber = aiSlots.get(0).slotNumber;
             endSlotNumber = aiSlots.get(aiSlots.size()-1).slotNumber;
         }

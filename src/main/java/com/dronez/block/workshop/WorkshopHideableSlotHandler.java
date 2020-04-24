@@ -12,12 +12,12 @@ public class WorkshopHideableSlotHandler extends SlotItemHandler {
     /**
      * The x location of this slot when shown
      */
-    private int desiredX;
+    private final int desiredX;
 
     /**
      * The y location of this slot when shown
      */
-    private int desiredY;
+    private final int desiredY;
 
     public WorkshopHideableSlotHandler(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
         super(itemHandler, index, xPosition, yPosition);

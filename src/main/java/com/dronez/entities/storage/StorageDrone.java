@@ -3,6 +3,7 @@ package com.dronez.entities.storage;
 import com.dronez.entities.Drone;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -130,5 +131,17 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
         if (this.isAlive() && capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && itemHandler != null)
             return itemHandler.cast();
         return super.getCapability(capability, facing);
+    }
+
+
+
+    static class Retrieve extends Goal {
+
+        @Override
+        public boolean shouldExecute() {
+            return false;
+        }
+
+
     }
 }

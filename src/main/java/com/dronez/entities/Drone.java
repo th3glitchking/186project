@@ -1,9 +1,9 @@
 package com.dronez.entities;
 
-import com.dronez.DronezUtils;
 import com.dronez.block.charger.ChargerBlockEnergy;
 import com.dronez.block.charger.ChargerBlockTileEntity;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
@@ -28,6 +28,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.EnergyStorage;
@@ -48,7 +49,7 @@ public class Drone extends TameableEntity {
     protected static final DataParameter<Byte> BLADE = EntityDataManager.createKey(Drone.class, DataSerializers.BYTE);
 
     // Energy tracking
-    private EnergyStorage battery;
+    private final EnergyStorage battery;
     private boolean charging;
 
     public Drone(EntityType<Drone> type, World p_i48578_2_) {
@@ -95,7 +96,7 @@ public class Drone extends TameableEntity {
             if (battery.getEnergyStored() == 0 && previousEnergy != 0) {
                 // Just ran out of battery
                 if (!world.isRemote) {
-                    DronezUtils.droneSays("Shutting down...");
+                    say("Shutting down...");
                 }
             }
         }
@@ -354,6 +355,14 @@ public class Drone extends TameableEntity {
         }
     }
 
+    /**
+     * Send a chat to the player from the Drone
+     * @param format the string to type and send
+     * @param args any arguments to the string to format in
+     */
+    public static void say(String format, Object... args) {
+        Minecraft.getInstance().player.sendMessage(new StringTextComponent(String.format("[Drone]: " + format, args)));
+    }
 
     /**
      * A goal that:
@@ -397,7 +406,7 @@ public class Drone extends TameableEntity {
         public boolean shouldContinueExecuting() {
             // If we don't need a charge anymore, we should exit
             if (!drone.needsCharge()) {
-                DronezUtils.droneSays("I'm done charging!");
+                say("I'm done charging!");
                 return false;
             }
 
