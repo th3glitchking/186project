@@ -46,7 +46,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class Drone extends TameableEntity {
+public class Drone extends FlyingEntity {
 
     // Material type tracking and texture locations
     protected static final DataParameter<Optional<UUID>> OWNER_UUID = EntityDataManager.createKey(Drone.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -83,8 +83,8 @@ public class Drone extends TameableEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new FollowOwner(this, 8.0F, 2.0F));
-        this.goalSelector.addGoal(2, new ChargingGoal(this));
+        this.goalSelector.addGoal(4, new FollowOwner(this, 8.0F, 2.0F));
+        this.goalSelector.addGoal(1, new ChargingGoal(this));
     }
 
     /**
@@ -164,12 +164,6 @@ public class Drone extends TameableEntity {
      */
     public BlockPos getPos() {
         return new BlockPos(posX, posY, posZ);
-    }
-
-    @Nullable
-    @Override
-    public AgeableEntity createChild(AgeableEntity ageable) {
-        return null;
     }
 
     @Override

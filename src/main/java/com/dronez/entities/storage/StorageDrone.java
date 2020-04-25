@@ -14,6 +14,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.ChestTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
@@ -23,6 +25,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 public class StorageDrone extends Drone implements INamedContainerProvider {
 
@@ -75,6 +78,7 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        this.goalSelector.addGoal(2, new Retrieve(this));
     }
 
     @Override
@@ -144,9 +148,77 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
 
     static class Retrieve extends Goal {
 
+        StorageDrone drone;
+        ChestTileEntity target;
+        ItemStack item;
+        int chestSlot;
+
+        public Retrieve(StorageDrone droneIn){
+            drone = droneIn;
+        }
+
         @Override
         public boolean shouldExecute() {
-            return false;
+            boolean flag = false;
+            for(int i = 0; i < drone.inv.getSizeInventory() && !flag; i++){
+                if(drone.inv.getStackInSlot(i).isEmpty()) {
+                    continue;
+                }
+                target = nearbyChestHasItem(drone.inv.getStackInSlot(i));
+                if(target != null){
+                    item = target.getStackInSlot(chestSlot);
+                    flag = true;
+                }
+            }
+            return flag;
+        }
+
+        public boolean shouldContinueExecuting() {
+            if (target == null) {
+                return false;
+            }
+
+            return !drone.getNavigator().noPath() && drone.getDistanceSq(target.getPos().getX(), target.getPos().getY() + 5, target.getPos().getZ()) > 100 && !drone.isCharging();
+        }
+
+        public void resetTask() {
+            drone.getNavigator().clearPath();
+            target = null;
+        }
+
+        public void tick() {
+            if (target == null || drone.isCharging()) {
+                return;
+            }
+
+            drone.getLookController().setLookPosition(target.getPos().getX(), target.getPos().getY() + 5, target.getPos().getZ(), 10.0F, (float) drone.getVerticalFaceSpeed());
+            drone.getNavigator().tryMoveToXYZ(target.getPos().getX(), target.getPos().getY() + 1, target.getPos().getZ(), drone.getSpeed());
+
+            if(drone.getPos().withinDistance(target.getPos(), 2)) {
+                for(int i = 0; i < drone.inv.getSizeInventory(); i++) {
+                    if(drone.inv.getStackInSlot(i).isEmpty()) {
+                        drone.inv.setInventorySlotContents(i,item.copy());
+                        target.setInventorySlotContents(chestSlot, ItemStack.EMPTY);
+                        target = null;
+                        return;
+                    }
+                }
+            }
+        }
+
+        public ChestTileEntity nearbyChestHasItem(ItemStack item) {
+            List<TileEntity> near = drone.world.loadedTileEntityList;
+            for(TileEntity x : near) {
+                if(x instanceof ChestTileEntity) {
+                    for(int i = 0; i < ((ChestTileEntity) x).getSizeInventory(); i++) {
+                        if(((ChestTileEntity) x).getStackInSlot(i).getItem().equals(item.getItem())) {
+                            chestSlot = i;
+                            return (ChestTileEntity)x;
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
 

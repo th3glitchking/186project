@@ -28,8 +28,8 @@ public class AttackDrone extends Drone {
     protected void registerGoals() {
         //this is a basic goal registration, I will need to make custom goal classes to have it follow the player or return to charger
         super.registerGoals();
-        this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
+        //this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
+        //this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
 
     }
 
