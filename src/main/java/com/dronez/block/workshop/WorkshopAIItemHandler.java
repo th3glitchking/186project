@@ -73,7 +73,6 @@ public class WorkshopAIItemHandler extends WorkshopAbstractItemHandler {
             ItemStack outputStack = new ItemStack(itemStacks.get(CORE).getItem(), 1);
             DroneCoreAiHelper.setType(outputStack, output);
             itemStacks.put(OUTPUT, outputStack);
-            LogManager.getLogger().debug("Output Core Type: {}", DroneCoreAiHelper.getType(outputStack));
         }
     }
 

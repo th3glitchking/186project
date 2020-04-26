@@ -84,7 +84,7 @@ public class Drone extends FlyingEntity {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(4, new FollowOwner(this, 8.0F, 2.0F));
-        this.goalSelector.addGoal(1, new ChargingGoal(this));
+        this.goalSelector.addGoal(5, new ChargingGoal(this));
     }
 
     /**

@@ -17,11 +17,15 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,8 +33,8 @@ import java.util.List;
 
 public class StorageDrone extends Drone implements INamedContainerProvider {
 
-    Inventory inv;
-    private net.minecraftforge.common.util.LazyOptional<?> itemHandler = null;
+    private Inventory inv;
+    private LazyOptional<?> itemHandler = null;
 
     public StorageDrone(EntityType<Drone> type, World p_i48578_2_) {
         super(type, p_i48578_2_);
@@ -40,14 +44,18 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
     @Override
     public void onDeath(DamageSource cause) {
         super.onDeath(cause);
-        // TODO - drop all items in chest
+
+        // Drop all items in chest
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            entityDropItem(inv.getStackInSlot(i));
+        }
     }
 
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
         ListNBT listnbt = new ListNBT();
 
-        for(int i = 0; i < 27; ++i) {
+        for (int i = 0; i < 27; ++i) {
             ItemStack itemstack = this.inv.getStackInSlot(i);
             if (!itemstack.isEmpty()) {
                 CompoundNBT compoundnbt = new CompoundNBT();
@@ -60,13 +68,14 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
         compound.put("Items", listnbt);
 
     }
+
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
 
         ListNBT listnbt = compound.getList("Items", 10);
         this.initChest();
 
-        for(int i = 0; i < listnbt.size(); ++i) {
+        for (int i = 0; i < listnbt.size(); ++i) {
             CompoundNBT compoundnbt = listnbt.getCompound(i);
             int j = compoundnbt.getByte("Slot") & 255;
             if (j < 27) {
@@ -138,8 +147,8 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
     }
 
     @Override
-    public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.util.Direction facing) {
-        if (this.isAlive() && capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && itemHandler != null)
+    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
+        if (this.isAlive() && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && itemHandler != null)
             return itemHandler.cast();
         return super.getCapability(capability, facing);
     }
@@ -160,12 +169,12 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
         @Override
         public boolean shouldExecute() {
             boolean flag = false;
-            for(int i = 0; i < drone.inv.getSizeInventory() && !flag; i++){
-                if(drone.inv.getStackInSlot(i).isEmpty()) {
+            for (int i = 0; i < drone.inv.getSizeInventory() && !flag; i++){
+                if (drone.inv.getStackInSlot(i).isEmpty()) {
                     continue;
                 }
                 target = nearbyChestHasItem(drone.inv.getStackInSlot(i));
-                if(target != null){
+                if (target != null){
                     item = target.getStackInSlot(chestSlot);
                     flag = true;
                 }
@@ -194,10 +203,10 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
             drone.getLookController().setLookPosition(target.getPos().getX(), target.getPos().getY() + 5, target.getPos().getZ(), 10.0F, (float) drone.getVerticalFaceSpeed());
             drone.getNavigator().tryMoveToXYZ(target.getPos().getX(), target.getPos().getY() + 1, target.getPos().getZ(), drone.getSpeed());
 
-            if(drone.getPos().withinDistance(target.getPos(), 2)) {
-                for(int i = 0; i < drone.inv.getSizeInventory(); i++) {
-                    if(drone.inv.getStackInSlot(i).isEmpty()) {
-                        drone.inv.setInventorySlotContents(i,item.copy());
+            if (drone.getPos().withinDistance(target.getPos(), 2)) {
+                for (int i = 0; i < drone.inv.getSizeInventory(); i++) {
+                    if (drone.inv.getStackInSlot(i).isEmpty()) {
+                        drone.inv.setInventorySlotContents(i, item.copy());
                         target.setInventorySlotContents(chestSlot, ItemStack.EMPTY);
                         target = null;
                         return;
@@ -208,10 +217,10 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
 
         public ChestTileEntity nearbyChestHasItem(ItemStack item) {
             List<TileEntity> near = drone.world.loadedTileEntityList;
-            for(TileEntity x : near) {
-                if(x instanceof ChestTileEntity) {
-                    for(int i = 0; i < ((ChestTileEntity) x).getSizeInventory(); i++) {
-                        if(((ChestTileEntity) x).getStackInSlot(i).getItem().equals(item.getItem())) {
+            for (TileEntity x : near) {
+                if (x instanceof ChestTileEntity) {
+                    for (int i = 0; i < ((ChestTileEntity) x).getSizeInventory(); i++) {
+                        if (((ChestTileEntity) x).getStackInSlot(i).getItem().equals(item.getItem())) {
                             chestSlot = i;
                             return (ChestTileEntity)x;
                         }

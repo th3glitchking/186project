@@ -14,17 +14,13 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class StorageContainer extends Container {
-    public static ContainerType<StorageContainer> TYPE = (ContainerType<StorageContainer>) IForgeContainerType.create((windowId, inv, data) -> {
-        return new StorageContainer(windowId, inv, 3);
-    }).setRegistryName("dronez", "storage_container");
+    public static ContainerType<StorageContainer> TYPE = (ContainerType<StorageContainer>) IForgeContainerType.create((windowId, inv, data) -> new StorageContainer(windowId, inv, 3)).setRegistryName("dronez", "storage_container");
 
     private final IInventory lowerChestInventory;
     private final int numRows;
-    private InvWrapper inv;
 
     public StorageContainer(int id, PlayerInventory player, int rows) {
         this(id, player, new Inventory(9 * rows), rows);
-        this.inv = new InvWrapper(player);
 
         //layoutPlayedInventorySlots(10, 70);
     }
