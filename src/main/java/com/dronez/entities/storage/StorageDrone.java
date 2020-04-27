@@ -204,14 +204,9 @@ public class StorageDrone extends Drone implements INamedContainerProvider {
             drone.getNavigator().tryMoveToXYZ(target.getPos().getX(), target.getPos().getY() + 1, target.getPos().getZ(), drone.getSpeed());
 
             if (drone.getPos().withinDistance(target.getPos(), 2)) {
-                for (int i = 0; i < drone.inv.getSizeInventory(); i++) {
-                    if (drone.inv.getStackInSlot(i).isEmpty()) {
-                        drone.inv.setInventorySlotContents(i, item.copy());
-                        target.setInventorySlotContents(chestSlot, ItemStack.EMPTY);
-                        target = null;
-                        return;
-                    }
-                }
+                ItemStack temp = drone.inv.addItem(item);
+                target.setInventorySlotContents(chestSlot, temp);
+                target = null;
             }
         }
 

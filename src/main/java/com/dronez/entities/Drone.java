@@ -369,7 +369,7 @@ public class Drone extends FlyingEntity {
             }
 
             drone.getLookController().setLookPositionWithEntity(drone.getOwner(), 10.0F, (float) drone.getVerticalFaceSpeed());
-            drone.getNavigator().tryMoveToXYZ(drone.getOwner().posX, drone.getOwner().posY + 5, drone.getOwner().posZ, drone.getSpeed());
+            drone.getNavigator().tryMoveToXYZ(drone.getOwner().posX, drone.getOwner().posY + 3, drone.getOwner().posZ, drone.getSpeed());
         }
     }
 
